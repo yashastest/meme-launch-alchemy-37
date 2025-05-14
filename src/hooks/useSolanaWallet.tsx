@@ -6,22 +6,21 @@ import { PhantomWalletAdapter, BackpackWalletAdapter } from '@solana/wallet-adap
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { clusterApiUrl, PublicKey } from '@solana/web3.js';
 import { toast } from 'sonner';
+import { SOLANA_CONFIG } from '@/config/app.config';
 
 // Import wallet adapter styles
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 // This is where you set your admin wallet public key(s)
 // In a production app, this should ideally be stored in environment variables
-const ADMIN_WALLET_ADDRESSES = [
-  'GoodKHf7DgxtVpPqNvJ3NU9mZRGaAAGK2TsqzAbowLdF', // Replace with your actual admin wallet address
-];
+const ADMIN_WALLET_ADDRESSES = SOLANA_CONFIG.ADMIN_WALLET_ADDRESSES;
 
 export const SolanaWalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
-  const network = WalletAdapterNetwork.MainnetBeta;
+  const network = WalletAdapterNetwork.Mainnet;
   
   // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  const endpoint = useMemo(() => SOLANA_CONFIG.RPC_ENDPOINT || clusterApiUrl(network), [network]);
   
   // Initialize all the supported wallets
   const wallets = useMemo(
