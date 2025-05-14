@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
@@ -6,14 +5,23 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdminLoginForm from '@/components/AdminLoginForm';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useWallet } from '@/hooks/useWallet';
 
 const AdminLogin = () => {
   // Ensure the page starts at the top when loaded
   useScrollToTop();
   const navigate = useNavigate();
+  const { connected, isAdmin } = useWallet();
   
   useEffect(() => {
-    // Check if already logged in, redirect to admin panel
+    // If wallet is connected and is an admin wallet, redirect to admin panel
+    if (connected && isAdmin) {
+      console.log("Admin wallet already connected, redirecting to admin panel");
+      navigate('/admin', { replace: true });
+      return;
+    }
+    
+    // Otherwise check for traditional login
     const isLoggedIn = localStorage.getItem("wybeAdminLoggedIn") === "true";
     const sessionExists = !!sessionStorage.getItem("wybeAdminSession");
     
@@ -29,7 +37,7 @@ const AdminLogin = () => {
       localStorage.removeItem("wybeAdminLoggedIn");
       sessionStorage.removeItem("wybeAdminSession");
     }
-  }, [navigate]);
+  }, [navigate, connected, isAdmin]);
   
   return (
     <div className="min-h-screen flex flex-col bg-black text-white">

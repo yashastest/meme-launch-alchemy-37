@@ -12,12 +12,12 @@ import Trade from './pages/Trade';
 import NotFound from './pages/NotFound';
 import { Toaster } from "sonner";
 import SecurityReport from './pages/SecurityReport';
-import { WalletProvider } from './hooks/useWallet';
+import { SolanaWalletProvider } from './hooks/useSolanaWallet';
 
 function App() {
   return (
     <div className="min-h-screen bg-black text-white">
-      <WalletProvider>
+      <SolanaWalletProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -32,7 +32,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster position="top-center" />
-      </WalletProvider>
+      </SolanaWalletProvider>
     </div>
   );
 }

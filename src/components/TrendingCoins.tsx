@@ -1,81 +1,69 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Rocket, Users, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchTrendingMemeCoins, formatTrendingCoins, TrendingCoin } from "@/services/coinService";
 
 const TrendingCoins = () => {
-  // Mock data
-  const trendingCoins = [
-    {
-      name: "Pepe Solana",
-      symbol: "PEPES",
-      price: "0.00023",
-      change: "+15.4%",
-      volume: "$52,000",
-      marketCap: "$230,000",
-      positive: true,
-      sparkline: [20, 22, 25, 22, 26, 27, 30, 28, 30, 35],
-      holderStats: {
-        whales: 12,
-        devs: 2,
-        retail: 4850
+  const [trendingCoins, setTrendingCoins] = useState<TrendingCoin[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCoins = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchTrendingMemeCoins();
+        const formattedData = formatTrendingCoins(data);
+        setTrendingCoins(formattedData);
+      } catch (error) {
+        console.error("Error loading trending coins:", error);
+      } finally {
+        setLoading(false);
       }
-    },
-    {
-      name: "Doge Sol",
-      symbol: "DSOL",
-      price: "0.00056",
-      change: "+8.2%",
-      volume: "$120,000",
-      marketCap: "$560,000",
-      positive: true,
-      sparkline: [40, 42, 45, 42, 46, 44, 48, 52, 50, 55],
-      holderStats: {
-        whales: 28,
-        devs: 4,
-        retail: 8750
-      }
-    },
-    {
-      name: "Shiba Solana",
-      symbol: "SHIBSOL",
-      price: "0.00012",
-      change: "-4.7%",
-      volume: "$32,000",
-      marketCap: "$120,000",
-      positive: false,
-      sparkline: [25, 22, 20, 18, 20, 22, 18, 16, 18, 15],
-      holderStats: {
-        whales: 8,
-        devs: 1,
-        retail: 2450
-      }
-    },
-    {
-      name: "Floki Sun",
-      symbol: "FLOKISUN",
-      price: "0.00034",
-      change: "+22.3%",
-      volume: "$78,000",
-      marketCap: "$340,000",
-      positive: true,
-      sparkline: [30, 35, 38, 40, 38, 42, 45, 50, 48, 55],
-      holderStats: {
-        whales: 16,
-        devs: 3,
-        retail: 5320
-      }
-    }
-  ];
+    };
+
+    loadCoins();
+    
+    // Refresh data every 60 seconds
+    const interval = setInterval(loadCoins, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {trendingCoins.map((coin, index) => (
-        <TrendingCoinCard key={index} coin={coin} delay={index * 0.1} />
-      ))}
+      {loading ? (
+        // Loading skeletons
+        Array(4).fill(0).map((_, index) => (
+          <div key={index} className="glass-card p-5">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+            
+            <Skeleton className="mb-4 h-16 w-full rounded-xl" />
+            
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              <Skeleton className="h-16 rounded-xl" />
+              <Skeleton className="h-16 rounded-xl" />
+            </div>
+            
+            <Skeleton className="mb-4 h-16 rounded-xl" />
+            
+            <Skeleton className="h-8 w-full rounded-md" />
+          </div>
+        ))
+      ) : (
+        trendingCoins.map((coin, index) => (
+          <TrendingCoinCard key={index} coin={coin} delay={index * 0.1} />
+        ))
+      )}
     </div>
   );
 };
