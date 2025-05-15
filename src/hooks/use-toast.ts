@@ -1,9 +1,10 @@
 
-import { toast as sonnerToast } from "sonner";
 import * as React from "react";
+import { toast as sonnerToast } from "sonner";
 
 // Types for the toast
 export interface ToastProps {
+  id?: string | number;
   title?: string;
   description?: string;
   action?: React.ReactNode;
@@ -17,16 +18,17 @@ export interface ToastActionType {
 }
 
 // Toast interface for the hook
-export interface ToastOptions extends ToastProps {
-  id?: number | string;
+export interface ToastOptions extends Partial<ToastProps> {
+  duration?: number;
+  position?: "top-center" | "top-right" | "bottom-right" | "bottom-center";
 }
 
 // Main toast hook
 export const useToast = () => {
   // Create a state array for toasts
-  const [toasts, setToasts] = React.useState<ToastOptions[]>([]);
+  const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
-  const toast = (props: ToastOptions) => {
+  const toast = (props: ToastProps) => {
     const id = props.id || Date.now().toString();
     setToasts((prevToasts) => [...prevToasts, { ...props, id }]);
     
@@ -57,32 +59,32 @@ export const useToast = () => {
 
 // Named exports for toast convenience functions
 export const toast = {
-  success: (title: string, options?: any) => 
+  success: (title: string, options?: Partial<ToastOptions>) => 
     sonnerToast.success(`✅ ${title}`, { 
       duration: 3000,
       position: "top-center",
-      ...options 
+      ...(options || {})
     }),
 
-  error: (title: string, options?: any) => 
+  error: (title: string, options?: Partial<ToastOptions>) => 
     sonnerToast.error(`❌ ${title}`, { 
       duration: 4000,
       position: "top-center",
-      ...options 
+      ...(options || {})
     }),
 
-  info: (title: string, options?: any) => 
+  info: (title: string, options?: Partial<ToastOptions>) => 
     sonnerToast(`ℹ️ ${title}`, { 
       duration: 3000,
       position: "top-center",
-      ...options 
+      ...(options || {})
     }),
 
-  warning: (title: string, options?: any) => 
+  warning: (title: string, options?: Partial<ToastOptions>) => 
     sonnerToast.warning(`⚠️ ${title}`, { 
       duration: 4000,
       position: "top-center",
-      ...options 
+      ...(options || {})
     }),
 
   // Generic method for custom toasts
