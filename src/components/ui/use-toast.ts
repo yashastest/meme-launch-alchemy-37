@@ -2,7 +2,7 @@
 import { toast as sonnerToast } from "sonner";
 
 // Configure the toast with custom properties for curved UI
-export const configuredToast = {
+const configuredToast = {
   ...sonnerToast,
   success: (title: string, options?: any) => 
     sonnerToast.success(`✅ ${title}`, { 
@@ -26,5 +26,5 @@ export const configuredToast = {
     }),
 };
 
-// Export as named export only (no default)
+// Export as named export
 export { configuredToast as toast };

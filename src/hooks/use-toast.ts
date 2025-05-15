@@ -46,5 +46,5 @@ export const useToast = () => {
   };
 };
 
-// Export the original sonner toast for direct usage
+// Export the sonner toast separately as a named export
 export { sonnerToast as toast };

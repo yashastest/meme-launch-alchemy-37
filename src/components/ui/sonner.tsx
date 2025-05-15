@@ -28,6 +28,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
-// Export components individually with named exports (no star exports)
+// Export components individually with named exports
 export { Toaster }
 export { toast as sonnerToast }
