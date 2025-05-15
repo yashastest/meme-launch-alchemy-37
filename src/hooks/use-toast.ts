@@ -1,6 +1,6 @@
 
 import React from "react";
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast, type ToastT } from "sonner";
 
 // Define the types
 export interface ToastProps {
@@ -22,7 +22,7 @@ export type ToastActionType = typeof toast;
 // The main toast function with various convenience methods
 const toast = Object.assign(
   (props: ToastProps & ToastOptions) => {
-    const { title, description, type, ...options } = props;
+    const { title, description, ...options } = props;
     
     return sonnerToast(title, {
       description,
@@ -37,13 +37,13 @@ const toast = Object.assign(
       sonnerToast.error(message, options),
     
     warning: (message: string, options?: ToastOptions) => 
-      sonnerToast(message, { ...options, type: "warning" }),
+      sonnerToast(message, { ...options }),
     
     info: (message: string, options?: ToastOptions) => 
-      sonnerToast(message, { ...options, type: "info" }),
+      sonnerToast(message, { ...options }),
     
     destructive: (message: string, options?: ToastOptions) => 
-      sonnerToast(message, { ...options, type: "destructive" }),
+      sonnerToast(message, { ...options }),
   }
 );
 
