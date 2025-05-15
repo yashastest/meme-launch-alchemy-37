@@ -12,6 +12,7 @@ window.global = window;
 
 // Create a minimal process polyfill for browser environment
 if (typeof window !== 'undefined' && !window.process) {
+  // Use type assertion to avoid TypeScript errors
   window.process = {
     env: {},
     // Basic properties to satisfy requirements without type errors
@@ -29,15 +30,17 @@ if (typeof window !== 'undefined' && !window.process) {
     chdir: () => {},
     exit: () => {},
     // And any other properties that might be referenced
-  };
+  } as any; // Type assertion to bypass strict typing
 }
 
-// Ensure Buffer is available
-window.Buffer = window.Buffer || { 
-  isBuffer: () => false,
-  from: () => ({}),
-  alloc: () => ({})
-};
+// Ensure Buffer is available - use type assertion to avoid errors
+if (!window.Buffer) {
+  window.Buffer = {
+    isBuffer: () => false,
+    from: () => ({}),
+    alloc: () => ({})
+  } as any; // Type assertion to bypass strict typing
+}
 
 // Sync configurations between services on startup
 const initializeServices = () => {

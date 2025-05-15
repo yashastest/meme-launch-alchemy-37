@@ -1,10 +1,18 @@
 
 import * as React from "react"
 
-import { ToastActionElement, ToastProps } from "@/components/ui/toast"
+import { ToastActionElement, ToastProps as RadixToastProps } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
+
+export type ToastProps = RadixToastProps & {
+  id: string
+  title?: string
+  description?: React.ReactNode
+  action?: ToastActionElement
+  type?: ToastType
+}
 
 export type ToastType = "default" | "destructive" | "success" | "warning" | "info" | "error"
 
