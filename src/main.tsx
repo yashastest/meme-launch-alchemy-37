@@ -8,20 +8,16 @@ import { smartContractService } from './services/smartContractService';
 
 // Polyfill global variables for browser compatibility
 window.global = window;
-// Create a proper process object with the minimum required properties
-window.process = window.process || { 
-  env: {} as Record<string, string>,
-  // Add minimal required Process properties
-  argv: [],
-  stdout: null,
-  stderr: null,
-  stdin: null,
-  version: '',
-  versions: {},
-  platform: '',
-  nextTick: (fn: () => void) => setTimeout(fn, 0),
-  cwd: () => '/',
-};
+
+// Create a simple process object for browser environment
+if (typeof window !== 'undefined') {
+  window.process = {
+    env: {},
+    // Add minimal required properties without type assertions
+    nextTick: (fn: () => void) => setTimeout(fn, 0)
+  };
+}
+
 window.Buffer = window.Buffer || { isBuffer: () => false };
 
 // Sync configurations between services on startup
