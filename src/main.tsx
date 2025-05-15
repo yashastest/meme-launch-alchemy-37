@@ -6,6 +6,11 @@ import './index.css';
 import { tradingService } from './services/tradingService';
 import { smartContractService } from './services/smartContractService';
 
+// Polyfill global variables for browser compatibility
+window.global = window;
+window.process = window.process || { env: {} };
+window.Buffer = window.Buffer || { isBuffer: () => false };
+
 // Sync configurations between services on startup
 const initializeServices = () => {
   const tradingConfig = tradingService.getConfig();
