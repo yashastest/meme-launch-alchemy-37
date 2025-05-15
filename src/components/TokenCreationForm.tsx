@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, AlertTriangle, Shield, Rocket } from "lucide-react";
@@ -126,8 +125,8 @@ const TokenCreationForm: React.FC<TokenCreationFormProps> = ({ activeTab, setAct
     }, 1500);
   };
   
-  const handleTokenCreation = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     
     if (!connected) {
       toast.error("Please connect your wallet first");
@@ -326,7 +325,7 @@ const TokenCreationForm: React.FC<TokenCreationFormProps> = ({ activeTab, setAct
   // Direct launch form
   return (
     <>
-      <form onSubmit={handleTokenCreation}>
+      <form onSubmit={handleSubmit}>
         <div className="space-y-4">
           <div>
             <Label htmlFor="name">Token Name</Label>

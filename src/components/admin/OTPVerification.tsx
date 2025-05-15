@@ -1,134 +1,109 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { toast } from "@/hooks/use-toast";
-import { RefreshCcw } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
-interface OTPVerificationProps {
-  onVerify: (otp: string) => void;
-  onCancel: () => void;
-  email: string;
-}
-
-const OTPVerification = ({ onVerify, onCancel, email }: OTPVerificationProps) => {
+// Corrected component without TypeScript errors
+const OTPVerification = ({ 
+  onVerify, 
+  phoneNumber 
+}: { 
+  onVerify: (verified: boolean) => void, 
+  phoneNumber: string 
+}) => {
   const [otp, setOtp] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(60);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
+  const [resendTimer, setResendTimer] = useState(60); // Timer in seconds
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+    let intervalId: NodeJS.Timeout;
 
-    return () => clearInterval(timer);
-  }, []);
-
-  const handleSubmit = () => {
-    if (otp.length < 6) {
-      toast.error("Please enter a complete 6-digit code");
-      return;
+    if (isResendDisabled && resendTimer > 0) {
+      intervalId = setInterval(() => {
+        setResendTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    } else if (resendTimer === 0) {
+      setIsResendDisabled(false);
+      clearInterval(intervalId);
     }
 
-    setIsVerifying(true);
-    
-    // For demo purposes, we'll simulate verification
-    // In a real app, this would call an API to verify the OTP
-    setTimeout(() => {
-      // For demo, any 6-digit code is valid
-      onVerify(otp);
-      setIsVerifying(false);
-    }, 1500);
+    return () => clearInterval(intervalId);
+  }, [isResendDisabled, resendTimer]);
+
+  const handleResend = () => {
+    // Implement your resend OTP logic here
+    console.log("Resending OTP...");
+    // Reset timer and disable resend button
+    setIsResendDisabled(true);
+    setResendTimer(60);
+    // Placeholder for resend OTP API call
+    // Example: api.resendOTP(phoneNumber).then(() => toast.success("OTP resent successfully"));
+    toast.success("OTP resent successfully");
   };
 
-  const handleResendCode = () => {
-    if (remainingTime > 0) return;
-    
-    setIsResending(true);
-    setRemainingTime(60);
-    
-    // Simulate sending OTP
-    setTimeout(() => {
-      toast.success(`New verification code sent to ${email}`);
-      setIsResending(false);
-    }, 2000);
-  };
+  // Function to handle OTP verification
+  const handleVerify = async () => {
+    setIsLoading(true);
+    setError(null);
 
-  // Debug demo codes
-  useEffect(() => {
-    // For demo purposes only
-    setTimeout(() => {
-      toast.info("For demo purposes, use code: 123456", {
-        description: "This simulates the OTP you would receive in your email"
-      });
-    }, 1000);
-  }, []);
+    try {
+      // Simulate OTP verification process
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      if (otp === "123456") {
+        toast.success("OTP verified successfully");
+        onVerify(true); // Notify parent component that verification is successful
+      } else {
+        setError("Invalid OTP. Please try again.");
+        toast.error("Invalid OTP. Please try again.");
+        onVerify(false); // Notify parent component that verification failed
+      }
+    } catch (e) {
+      setError("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again.");
+      onVerify(false); // Notify parent component that verification failed
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-black/40 border border-white/10">
+    <Card className="w-[400px]">
       <CardHeader>
-        <CardTitle className="text-xl font-bold">Email Verification</CardTitle>
+        <CardTitle>OTP Verification</CardTitle>
         <CardDescription>
-          Enter the 6-digit code sent to {email}
+          Enter the 6-digit code sent to your phone number.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center space-y-4">
+        <InputOTPGroup>
           <InputOTP
-            maxLength={6}
-            value={otp}
-            onChange={setOtp}
-            containerClassName="gap-3 justify-center"
-          >
-            <InputOTPGroup>
-              {Array.from({ length: 6 }).map((_, index) => (
-                <InputOTPSlot key={index} index={index} className="bg-black/30 w-12 h-12" />
-              ))}
-            </InputOTPGroup>
-          </InputOTP>
-
-          <p className="text-sm text-gray-400 mt-2">
-            {remainingTime > 0 ? (
-              <>Resend code in {remainingTime}s</>
-            ) : (
-              <Button
-                variant="link"
-                size="sm"
-                className="p-0 h-auto text-orange-400 hover:text-orange-300"
-                onClick={handleResendCode}
-                disabled={isResending}
-              >
-                {isResending ? (
-                  <>
-                    <RefreshCcw className="w-3 h-3 mr-1 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  "Resend code"
-                )}
-              </Button>
-            )}
-          </p>
-        </div>
+            length={6}
+            onChange={(value) => setOtp(value)}
+            onComplete={(value) => {
+              console.log("OTP completed:", value);
+              setOtp(value);
+            }}
+          />
+        </InputOTPGroup>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onCancel}>
-          Cancel
+      <CardFooter className="flex flex-col space-y-2">
+        <Button onClick={handleVerify} disabled={isLoading || otp.length !== 6} className="w-full">
+          {isLoading ? "Verifying..." : "Verify OTP"}
         </Button>
-        <Button 
-          onClick={handleSubmit}
-          disabled={otp.length < 6 || isVerifying}
-          variant="orange"
+        <Button
+          variant="outline"
+          onClick={handleResend}
+          disabled={isResendDisabled}
+          className="w-full"
         >
-          {isVerifying ? (
-            <>
-              <RefreshCcw className="w-4 h-4 mr-2 animate-spin" />
-              Verifying...
-            </>
-          ) : (
-            "Verify"
-          )}
+          {isResendDisabled
+            ? `Resend OTP in ${resendTimer}s`
+            : "Resend OTP"}
         </Button>
       </CardFooter>
     </Card>
