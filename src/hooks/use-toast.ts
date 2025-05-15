@@ -3,18 +3,18 @@
 import { toast as sonnerToast } from "sonner";
 
 // Types for the toast
-export type ToastProps = {
+export interface ToastProps {
   title?: string;
   description?: string;
   action?: React.ReactNode;
   type?: "default" | "success" | "error" | "warning" | "info";
-};
+}
 
-export type ToastActionType = {
+export interface ToastActionType {
   altText?: string;
   onClick: () => void;
   children: React.ReactNode;
-};
+}
 
 // Toast interface for the hook
 export interface ToastOptions extends ToastProps {

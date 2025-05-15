@@ -111,10 +111,11 @@ const ToastDescription = React.forwardRef<
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
+// Export types as named exports, not type exports
 export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
-
 export type ToastActionElement = React.ReactElement<typeof ToastAction>
 
+// Named exports for all components
 export {
   ToastProvider,
   ToastViewport,
