@@ -28,8 +28,12 @@ export type ToastActionType = {
   children?: React.ReactNode
 }
 
-// Basic toast function that returns standard toast object
-const createToastFn = () => ({ id: "1", dismiss: () => {}, update: () => {} });
+// Basic toast function that returns standard toast object with consistent interface
+const createToastFn = () => ({ 
+  id: "1", 
+  dismiss: () => {}, 
+  update: () => {} 
+});
 
 // Create the toast object with all required methods
 const toast = Object.assign(
