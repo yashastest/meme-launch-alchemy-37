@@ -8,12 +8,7 @@ const noopFn = () => {};
 const createToast = (options?: any) => ({
   id: "1", 
   dismiss: noopFn, 
-  update: noopFn,
-  // Add these properties to fix TypeScript errors
-  success: noopFn,
-  error: noopFn,
-  warning: noopFn,
-  info: noopFn
+  update: noopFn
 });
 
 // Create the toast object with all required methods
@@ -21,19 +16,14 @@ export const toast = Object.assign(
   // Base toast function
   (options?: any) => createToast(options),
   {
-    // Common toast variants
+    // Common toast variants as methods
     success: (options?: any) => createToast(options),
     error: (options?: any) => createToast(options),
     info: (options?: any) => createToast(options),
     warning: (options?: any) => createToast(options),
     // Additional methods
     dismiss: noopFn,
-    update: (id: string, options?: any) => createToast(options),
-    // Add these properties to the object itself
-    success: noopFn,
-    error: noopFn,
-    warning: noopFn,
-    info: noopFn
+    update: (id: string, options?: any) => createToast(options)
   }
 );
 

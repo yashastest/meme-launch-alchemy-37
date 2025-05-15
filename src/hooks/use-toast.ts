@@ -28,19 +28,23 @@ export type ToastActionType = {
   children?: React.ReactNode
 }
 
-// Create a simple toast function that returns a standard object
+// Basic toast function that returns standard toast object
 const createToastFn = () => ({ id: "1", dismiss: () => {}, update: () => {} });
 
-// Basic toast function that returns standard toast object
-const toast = (options?: ToastOptions | string) => createToastFn();
-
-// Add common toast types that return the same object structure
-toast.success = (options?: ToastOptions | string) => createToastFn();
-toast.error = (options?: ToastOptions | string) => createToastFn();
-toast.warning = (options?: ToastOptions | string) => createToastFn();
-toast.info = (options?: ToastOptions | string) => createToastFn();
-toast.dismiss = () => {};
-toast.update = () => createToastFn();
+// Create the toast object with all required methods
+const toast = Object.assign(
+  // Base toast function
+  (options?: ToastOptions | string) => createToastFn(),
+  {
+    // Methods
+    success: (options?: ToastOptions | string) => createToastFn(),
+    error: (options?: ToastOptions | string) => createToastFn(),
+    warning: (options?: ToastOptions | string) => createToastFn(),
+    info: (options?: ToastOptions | string) => createToastFn(),
+    dismiss: () => {},
+    update: (id: string, options?: ToastOptions | string) => createToastFn()
+  }
+);
 
 function useToast() {
   // Return a mock state that won't cause rendering issues
