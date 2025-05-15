@@ -1,4 +1,3 @@
-
 import mongoDbService, { TokenData } from '@/services/mongoDbService';
 import { Keypair, Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
 import { toast } from "@/hooks/use-toast";
@@ -64,8 +63,8 @@ export const wybeTokenService = {
       // Wait to simulate network operation
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Create token record in MongoDB
-      const tokenData: Partial<TokenData> = {
+      // Create token record in MongoDB - Fix: ensure all required fields are provided
+      const tokenData: Omit<TokenData, "id" | "createdAt"> = {
         name: config.name,
         symbol: config.symbol,
         address: mockTokenAddress,
@@ -73,8 +72,7 @@ export const wybeTokenService = {
         launchStatus: 'live',
         marketCap: 10000, // Initial mock market cap
         volume24h: 500, // Initial mock volume
-        launchDate: new Date(),
-        createdAt: new Date()
+        launchDate: new Date()
       };
       
       // Save token to database
