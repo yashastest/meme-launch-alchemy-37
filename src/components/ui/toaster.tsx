@@ -6,6 +6,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
+  type ToastProps as RadixToastProps
 } from "@/components/ui/toast"
 import { useToast } from "@/hooks/use-toast"
 
@@ -24,7 +25,7 @@ export function Toaster() {
         return (
           <Toast 
             key={id} 
-            {...props}
+            {...props as RadixToastProps}
             variant={mapToastTypeToVariant(type)}
             className={
               type === "success" ? "bg-green-600" :

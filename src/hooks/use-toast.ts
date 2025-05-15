@@ -1,15 +1,16 @@
+
 // Import from sonner for toast functionality
 import { toast as sonnerToast } from "sonner";
 
 // Types for the toast
-type ToastProps = {
+export type ToastProps = {
   title?: string;
   description?: string;
   action?: React.ReactNode;
   type?: "default" | "success" | "error" | "warning" | "info";
 };
 
-type ToastActionType = {
+export type ToastActionType = {
   altText?: string;
   onClick: () => void;
   children: React.ReactNode;
