@@ -28,28 +28,26 @@ export type ToastActionType = {
   children?: React.ReactNode
 }
 
-const noopFn = () => {};
+// Create a simple toast function that returns a standard object
+const createToastFn = () => ({ id: "1", dismiss: () => {}, update: () => {} });
 
-// Create a simple toast object with no functionality
-const toast = {
-  // Basic method that returns an object with expected shape but does nothing
-  id: "1",
-  dismiss: noopFn,
-  update: noopFn
-};
+// Basic toast function that returns standard toast object
+const toast = (options?: ToastOptions | string) => createToastFn();
 
-// Add common toast types as no-op functions
-toast.success = () => ({ id: "1", dismiss: noopFn, update: noopFn });
-toast.error = () => ({ id: "1", dismiss: noopFn, update: noopFn });
-toast.warning = () => ({ id: "1", dismiss: noopFn, update: noopFn });
-toast.info = () => ({ id: "1", dismiss: noopFn, update: noopFn });
+// Add common toast types that return the same object structure
+toast.success = (options?: ToastOptions | string) => createToastFn();
+toast.error = (options?: ToastOptions | string) => createToastFn();
+toast.warning = (options?: ToastOptions | string) => createToastFn();
+toast.info = (options?: ToastOptions | string) => createToastFn();
+toast.dismiss = () => {};
+toast.update = () => createToastFn();
 
 function useToast() {
   // Return a mock state that won't cause rendering issues
   return {
     toasts: [],
     toast,
-    dismiss: noopFn,
+    dismiss: () => {},
   }
 }
 

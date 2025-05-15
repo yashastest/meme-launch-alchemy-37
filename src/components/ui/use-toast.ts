@@ -3,15 +3,18 @@
 // All imports that might use this will be handled with fallbacks
 
 const noopFn = () => {};
+const createToastFn = () => ({ id: "1", dismiss: noopFn, update: noopFn });
 
 export const toast = {
-  // Basic method that does nothing
-  noopFn,
-  // Common toast variants as no-op functions
-  error: noopFn,
-  success: noopFn, 
-  info: noopFn,
-  warning: noopFn,
+  // Basic toast function
+  ...((options?: any) => createToastFn()),
+  // Common toast variants
+  success: (options?: any) => createToastFn(),
+  error: (options?: any) => createToastFn(),
+  info: (options?: any) => createToastFn(),
+  warning: (options?: any) => createToastFn(),
+  dismiss: noopFn,
+  update: () => createToastFn(),
 };
 
 export const useToast = () => {
