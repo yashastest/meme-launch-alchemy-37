@@ -28,11 +28,14 @@ export type ToastActionType = {
   children?: React.ReactNode
 }
 
-// Basic toast function that returns standard toast object with consistent interface
+// Create a simple no-op function for all methods
+const noopFn = () => {};
+
+// Create a toast object with consistent return value
 const createToastFn = () => ({ 
   id: "1", 
-  dismiss: () => {}, 
-  update: () => {} 
+  dismiss: noopFn, 
+  update: noopFn 
 });
 
 // Create the toast object with all required methods
@@ -45,7 +48,7 @@ const toast = Object.assign(
     error: (options?: ToastOptions | string) => createToastFn(),
     warning: (options?: ToastOptions | string) => createToastFn(),
     info: (options?: ToastOptions | string) => createToastFn(),
-    dismiss: () => {},
+    dismiss: noopFn,
     update: (id: string, options?: ToastOptions | string) => createToastFn()
   }
 );
@@ -55,7 +58,7 @@ function useToast() {
   return {
     toasts: [],
     toast,
-    dismiss: () => {},
+    dismiss: noopFn,
   }
 }
 
