@@ -28,5 +28,5 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
-// Export Toaster as a named export only
+// Export Toaster as named export only
 export { Toaster }

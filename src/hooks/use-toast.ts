@@ -46,5 +46,27 @@ export const useToast = () => {
   };
 };
 
-// Export sonnerToast directly for components that need it
-export { sonnerToast as toast };
+// Export a simple toast function for direct use in components
+export const toast = {
+  success: (title: string, options?: any) => 
+    sonnerToast.success(`✅ ${title}`, { 
+      className: "rounded-xl border border-green-500/20 shadow-curved",
+      ...options 
+    }),
+  error: (title: string, options?: any) => 
+    sonnerToast.error(`❌ ${title}`, { 
+      className: "rounded-xl border border-red-500/20 shadow-curved",
+      ...options 
+    }),
+  info: (title: string, options?: any) => 
+    sonnerToast.info(`ℹ️ ${title}`, { 
+      className: "rounded-xl border border-blue-500/20 shadow-curved",
+      ...options 
+    }),
+  warning: (title: string, options?: any) => 
+    sonnerToast.warning(`⚠️ ${title}`, { 
+      className: "rounded-xl border border-yellow-500/20 shadow-curved",
+      ...options 
+    }),
+  dismiss: sonnerToast.dismiss,
+};
