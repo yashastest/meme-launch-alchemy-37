@@ -2,7 +2,7 @@
 // This file is kept for compatibility with components expecting shadcn/ui toast functionality
 // It delegates to the sonner toast
 
-import { toast as sonnerToast } from "sonner";
+import { toast as sonnerToast, type ExternalToast } from "sonner";
 
 const noopFn = () => {};
 
@@ -13,29 +13,49 @@ const createToast = (options?: any) => ({
   update: noopFn
 });
 
+// Helper to convert our options to Sonner's format
+const convertToSonnerOptions = (options?: any): {message: string, options?: ExternalToast} => {
+  if (typeof options === 'string') {
+    return { message: options };
+  } else if (options) {
+    return { 
+      message: options.title || '',
+      options: {
+        description: options.description
+      } 
+    };
+  }
+  return { message: '' };
+};
+
 // Create the toast object with all required methods
 export const toast = Object.assign(
   // Base toast function
   (options?: any) => {
-    sonnerToast(options?.title || options || "", options?.description || "");
+    const { message, options: toastOptions } = convertToSonnerOptions(options);
+    sonnerToast(message, toastOptions);
     return createToast(options);
   },
   {
     // Common toast variants as methods
     success: (options?: any) => {
-      sonnerToast.success(options?.title || options || "", options?.description || "");
+      const { message, options: toastOptions } = convertToSonnerOptions(options);
+      sonnerToast.success(message, toastOptions);
       return createToast(options);
     },
     error: (options?: any) => {
-      sonnerToast.error(options?.title || options || "", options?.description || "");
+      const { message, options: toastOptions } = convertToSonnerOptions(options);
+      sonnerToast.error(message, toastOptions);
       return createToast(options);
     },
     info: (options?: any) => {
-      sonnerToast.info(options?.title || options || "", options?.description || "");
+      const { message, options: toastOptions } = convertToSonnerOptions(options);
+      sonnerToast.info(message, toastOptions);
       return createToast(options);
     },
     warning: (options?: any) => {
-      sonnerToast.warning(options?.title || options || "", options?.description || "");
+      const { message, options: toastOptions } = convertToSonnerOptions(options);
+      sonnerToast.warning(message, toastOptions);
       return createToast(options);
     },
     
