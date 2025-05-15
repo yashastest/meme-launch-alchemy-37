@@ -1,6 +1,7 @@
+
 import mongoDbService, { TokenData } from '@/services/mongoDbService';
-import { Keypair, Connection, clusterApiUrl, PublicKey } from '@solana/web3.js';
 import { toast } from "@/hooks/use-toast";
+import { deployToken as anchorDeployToken, buyTokens as anchorBuyTokens, sellTokens as anchorSellTokens, claimCreatorRewards as anchorClaimRewards } from '@/services/anchorService';
 
 // Types for token deployment
 export interface TokenDeploymentConfig {
@@ -55,35 +56,33 @@ export const wybeTokenService = {
         };
       }
       
-      // In a real implementation, this would call the Anchor deployment script
-      // For now, we'll simulate a successful deployment with mock data
-      const mockTokenAddress = 'TokenAddress' + Math.random().toString(36).substring(2, 10);
-      const mockTxId = 'tx_' + Math.random().toString(36).substring(2, 15);
-      
-      // Wait to simulate network operation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Create token record in MongoDB - Fix: ensure all required fields are provided
-      const tokenData: Omit<TokenData, "id" | "createdAt"> = {
+      // Use the Anchor service to deploy the token
+      const result = await anchorDeployToken({
         name: config.name,
         symbol: config.symbol,
-        address: mockTokenAddress,
-        ownerWallet: config.creatorWallet,
-        launchStatus: 'live',
-        marketCap: 10000, // Initial mock market cap
-        volume24h: 500, // Initial mock volume
-        launchDate: new Date()
-      };
+        initialSupply: config.initialSupply,
+        creatorWallet: config.creatorWallet,
+        description: config.description,
+        website: config.website,
+        telegram: config.telegram
+      });
       
-      // Save token to database
-      await mongoDbService.createToken(tokenData);
+      if (!result.success) {
+        return {
+          success: false,
+          message: result.error || 'Unknown error during token deployment'
+        };
+      }
+      
+      // Get token data from MongoDB
+      const tokenData = await mongoDbService.getTokenByAddress(result.tokenAddress!);
       
       // Return deployment result
       return {
         success: true,
-        tokenAddress: mockTokenAddress,
+        tokenAddress: result.tokenAddress!,
         message: `Token ${config.name} (${config.symbol}) deployed successfully!`,
-        transaction: mockTxId,
+        transaction: 'tx_' + Math.random().toString(36).substring(2, 15), // In production, this would be the actual transaction ID
         data: {
           name: config.name,
           symbol: config.symbol,
@@ -105,25 +104,27 @@ export const wybeTokenService = {
     try {
       console.log('Buying tokens:', config);
       
-      // In a real implementation, this would call the Anchor program 
-      // For now, we'll simulate a successful purchase
+      // Use the Anchor service to buy tokens
+      const result = await anchorBuyTokens(config);
+      
+      if (!result.success) {
+        return {
+          success: false,
+          message: result.error || 'Unknown error during token purchase'
+        };
+      }
       
       // Mock price calculation (0.001 SOL per token + bonding curve effect)
+      // In production, this would come from the blockchain transaction result
       const basePrice = 0.001;
       const bondingFactor = 1 + (config.amount / 10000);
       const calculatedPrice = basePrice * bondingFactor;
       const totalCost = calculatedPrice * config.amount;
       
-      // Wait to simulate network operation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock transaction ID
-      const mockTxId = 'tx_' + Math.random().toString(36).substring(2, 15);
-      
       return {
         success: true,
         message: `Successfully purchased ${config.amount} tokens for ${totalCost.toFixed(4)} SOL`,
-        transaction: mockTxId,
+        transaction: result.transaction,
         tokens: config.amount,
         cost: Number(totalCost.toFixed(4))
       };
@@ -141,25 +142,27 @@ export const wybeTokenService = {
     try {
       console.log('Selling tokens:', config);
       
-      // In a real implementation, this would call the Anchor program 
-      // For now, we'll simulate a successful sale
+      // Use the Anchor service to sell tokens
+      const result = await anchorSellTokens(config);
+      
+      if (!result.success) {
+        return {
+          success: false,
+          message: result.error || 'Unknown error during token sale'
+        };
+      }
       
       // Mock price calculation (0.0009 SOL per token - lower than buy price with slippage)
+      // In production, this would come from the blockchain transaction result
       const basePrice = 0.0009;
       const bondingFactor = 1 - (config.amount / 20000); // Some price impact
       const calculatedPrice = basePrice * bondingFactor;
       const totalProceeds = calculatedPrice * config.amount;
       
-      // Wait to simulate network operation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock transaction ID
-      const mockTxId = 'tx_' + Math.random().toString(36).substring(2, 15);
-      
       return {
         success: true,
         message: `Successfully sold ${config.amount} tokens for ${totalProceeds.toFixed(4)} SOL`,
-        transaction: mockTxId,
+        transaction: result.transaction,
         tokens: config.amount,
         proceeds: Number(totalProceeds.toFixed(4))
       };
@@ -177,23 +180,21 @@ export const wybeTokenService = {
     try {
       console.log('Claiming rewards for token:', tokenAddress, 'creator:', creatorWallet);
       
-      // In a real implementation, this would call the Anchor program
-      // For now, we'll simulate a successful claim
+      // Use the Anchor service to claim rewards
+      const result = await anchorClaimRewards(tokenAddress, creatorWallet);
       
-      // Mock rewards amount
-      const rewardsAmount = Math.random() * 0.5; // Between 0 and 0.5 SOL
-      
-      // Wait to simulate network operation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock transaction ID
-      const mockTxId = 'tx_' + Math.random().toString(36).substring(2, 15);
+      if (!result.success) {
+        return {
+          success: false,
+          message: result.error || 'Unknown error during reward claim'
+        };
+      }
       
       return {
         success: true,
-        message: `Successfully claimed ${rewardsAmount.toFixed(4)} SOL in creator rewards`,
-        transaction: mockTxId,
-        proceeds: Number(rewardsAmount.toFixed(4))
+        message: `Successfully claimed ${result.rewardsAmount?.toFixed(4)} SOL in creator rewards`,
+        transaction: result.transaction,
+        proceeds: result.rewardsAmount
       };
     } catch (error) {
       console.error('Reward claim error:', error);
@@ -209,13 +210,25 @@ export const wybeTokenService = {
     try {
       console.log('Getting market data for token:', tokenAddress);
       
-      // In a real implementation, this would call an API like Birdeye or DexScreener
-      // For now, we'll return mock data
+      // Get token from MongoDB
+      const token = await mongoDbService.getTokenByAddress(tokenAddress);
       
-      // Generate some mock market data
+      if (!token) {
+        return {
+          success: false,
+          tokenAddress,
+          message: 'Token not found'
+        };
+      }
+      
+      // In a real implementation, this would call an API like Birdeye or DexScreener
+      // or use on-chain data. For now, we'll return data from MongoDB with some
+      // random variations for dynamic values.
+      
+      // Generate some mock market data based on stored values
       const currentPrice = 0.001 * (1 + Math.random() * 0.5); // Between 0.001 and 0.0015
-      const marketCap = currentPrice * 1000000000; // Based on 1B total supply
-      const volume24h = marketCap * (0.05 + Math.random() * 0.2); // 5-25% of market cap
+      const marketCap = token.marketCap || currentPrice * 1000000000; // Based on 1B total supply
+      const volume24h = token.volume24h || marketCap * (0.05 + Math.random() * 0.2); // 5-25% of market cap
       
       // Generate mock price history for charts
       const priceHistory = Array.from({ length: 24 }, (_, i) => {

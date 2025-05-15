@@ -1,118 +1,175 @@
 
-/**
- * MongoDB Service
- * 
- * This service provides functions for interacting with MongoDB collections.
- * It will be used to replace the current hardcoded/dummy data with live data from MongoDB.
- */
+import { connectMongo } from '@/lib/mongodb';
+import AdminUserModel, { AdminUser } from '@/models/AdminUser';
+import TokenModel, { TokenDocument } from '@/models/Token';
+import SubmissionModel, { SubmissionDocument } from '@/models/CreatorSubmission';
+import bcrypt from 'bcryptjs';
 
-// MongoDB schema examples (to be implemented with actual MongoDB connection)
-export interface AdminUser {
-  id?: string;
-  username: string;
-  email?: string;
-  passwordHash?: string; // Store hashed passwords only
-  permissions: string[];
-  createdAt: Date;
-}
+// MongoDB schema examples
+export {
+  AdminUser,
+  TokenDocument as TokenData,
+  SubmissionDocument as CreatorSubmission
+};
 
-export interface CreatorSubmission {
-  id?: string;
-  walletAddress: string;
-  email: string;
-  telegram?: string;
-  projectName: string;
-  description: string;
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: Date;
-}
-
-export interface TokenData {
-  id?: string;
-  symbol: string;
-  name: string;
-  address?: string;
-  ownerWallet: string;
-  launchStatus: 'upcoming' | 'live' | 'flagged';
-  marketCap?: number;
-  volume24h?: number;
-  launchDate?: Date;
-  createdAt: Date;
-}
-
-// Mock MongoDB service - Replace with actual MongoDB connection 
+// Real MongoDB service implementation
 class MongoDbService {
   // Admin management
   async getAdminByUsername(username: string): Promise<AdminUser | null> {
-    console.log('Getting admin by username:', username);
-    // Replace with actual MongoDB query
-    if (username === 'admin') {
-      return {
-        id: '1',
-        username: 'admin',
-        email: 'admin@wybe.io',
-        permissions: ['all'],
-        createdAt: new Date()
-      };
+    try {
+      await connectMongo();
+      return await AdminUserModel.findOne({ username }).lean();
+    } catch (error) {
+      console.error('Error getting admin by username:', error);
+      return null;
     }
-    return null;
   }
 
-  async createAdmin(adminData: Omit<AdminUser, 'id' | 'createdAt'>): Promise<AdminUser> {
-    console.log('Creating new admin:', adminData);
-    // Replace with actual MongoDB insertion
-    return {
-      id: Math.random().toString(),
-      ...adminData,
-      createdAt: new Date()
-    };
+  async createAdmin(adminData: Omit<AdminUser, 'id' | 'createdAt' | 'passwordHash'> & { password: string }): Promise<AdminUser | null> {
+    try {
+      await connectMongo();
+      
+      // Check if admin already exists
+      const existingAdmin = await AdminUserModel.findOne({ username: adminData.username });
+      if (existingAdmin) {
+        throw new Error('Admin with this username already exists');
+      }
+      
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(adminData.password, salt);
+      
+      // Create new admin
+      const newAdmin = new AdminUserModel({
+        username: adminData.username,
+        email: adminData.email,
+        passwordHash,
+        permissions: adminData.permissions,
+      });
+      
+      await newAdmin.save();
+      return newAdmin.toObject();
+    } catch (error) {
+      console.error('Error creating admin:', error);
+      return null;
+    }
+  }
+
+  async validateAdminCredentials(username: string, password: string): Promise<AdminUser | null> {
+    try {
+      await connectMongo();
+      const admin = await AdminUserModel.findOne({ username });
+      
+      if (!admin) return null;
+      
+      const isValidPassword = await bcrypt.compare(password, admin.passwordHash);
+      if (!isValidPassword) return null;
+      
+      return admin.toObject();
+    } catch (error) {
+      console.error('Error validating admin credentials:', error);
+      return null;
+    }
   }
   
   // Creator submissions
-  async getSubmissions(status?: string): Promise<CreatorSubmission[]> {
-    console.log('Getting submissions with status:', status || 'all');
-    // Replace with actual MongoDB query
-    return []; // Return empty array for now
+  async getSubmissions(status?: string): Promise<SubmissionDocument[]> {
+    try {
+      await connectMongo();
+      
+      const query = status ? { status } : {};
+      return await SubmissionModel.find(query).sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error('Error getting submissions:', error);
+      return [];
+    }
   }
   
-  async createSubmission(submission: Omit<CreatorSubmission, 'id' | 'createdAt' | 'status'>): Promise<CreatorSubmission> {
-    console.log('Creating new submission:', submission);
-    // Replace with actual MongoDB insertion
-    return {
-      id: Math.random().toString(),
-      ...submission,
-      status: 'pending',
-      createdAt: new Date()
-    };
+  async createSubmission(submission: Omit<SubmissionDocument, 'id' | 'createdAt' | 'status'>): Promise<SubmissionDocument | null> {
+    try {
+      await connectMongo();
+      
+      const newSubmission = new SubmissionModel({
+        ...submission,
+        status: 'pending',
+      });
+      
+      await newSubmission.save();
+      return newSubmission.toObject();
+    } catch (error) {
+      console.error('Error creating submission:', error);
+      return null;
+    }
   }
   
   async updateSubmissionStatus(id: string, status: 'approved' | 'rejected'): Promise<boolean> {
-    console.log(`Updating submission ${id} status to ${status}`);
-    // Replace with actual MongoDB update
-    return true;
+    try {
+      await connectMongo();
+      
+      const result = await SubmissionModel.updateOne(
+        { _id: id }, 
+        { $set: { status } }
+      );
+      
+      return result.modifiedCount > 0;
+    } catch (error) {
+      console.error('Error updating submission status:', error);
+      return false;
+    }
   }
   
   // Token management
-  async getTokens(filters?: Partial<TokenData>): Promise<TokenData[]> {
-    console.log('Getting tokens with filters:', filters);
-    // Replace with actual MongoDB query
-    return []; // Return empty array for now
+  async getTokens(filters?: Partial<TokenDocument>): Promise<TokenDocument[]> {
+    try {
+      await connectMongo();
+      
+      return await TokenModel.find(filters || {})
+        .sort({ createdAt: -1 })
+        .lean();
+    } catch (error) {
+      console.error('Error getting tokens:', error);
+      return [];
+    }
   }
   
-  async createToken(tokenData: Omit<TokenData, 'id' | 'createdAt'>): Promise<TokenData> {
-    console.log('Creating new token:', tokenData);
-    // Replace with actual MongoDB insertion
-    return {
-      id: Math.random().toString(),
-      ...tokenData,
-      createdAt: new Date()
-    };
+  async createToken(tokenData: Omit<TokenDocument, 'id' | 'createdAt'>): Promise<TokenDocument | null> {
+    try {
+      await connectMongo();
+      
+      const newToken = new TokenModel(tokenData);
+      await newToken.save();
+      
+      return newToken.toObject();
+    } catch (error) {
+      console.error('Error creating token:', error);
+      return null;
+    }
   }
   
-  async updateToken(id: string, tokenData: Partial<TokenData>): Promise<boolean> {
-    console.log(`Updating token ${id}:`, tokenData);
-    // Replace with actual MongoDB update
-    return true;
+  async updateToken(id: string, tokenData: Partial<TokenDocument>): Promise<boolean> {
+    try {
+      await connectMongo();
+      
+      const result = await TokenModel.updateOne(
+        { _id: id }, 
+        { $set: tokenData }
+      );
+      
+      return result.modifiedCount > 0;
+    } catch (error) {
+      console.error('Error updating token:', error);
+      return false;
+    }
+  }
+
+  async getTokenByAddress(address: string): Promise<TokenDocument | null> {
+    try {
+      await connectMongo();
+      return await TokenModel.findOne({ address }).lean();
+    } catch (error) {
+      console.error('Error getting token by address:', error);
+      return null;
+    }
   }
 }
 

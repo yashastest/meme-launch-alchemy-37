@@ -1,12 +1,20 @@
 
-import { 
-  deployToken as anchorDeployToken,
-  buyTokens as anchorBuyTokens,
-  sellTokens as anchorSellTokens,
-  claimCreatorRewards as anchorClaimRewards
-} from '../../anchor-program/scripts/token-deploy';
 import { toast } from '@/hooks/use-toast';
 import mongoDbService from '@/services/mongoDbService';
+import { ENV_CONFIG } from '@/config/env.config';
+import { Connection, PublicKey, Transaction, SystemProgram, Keypair } from '@solana/web3.js';
+import { BN } from 'bn.js';
+
+// Get connection to Solana network
+const getConnection = () => {
+  return new Connection(ENV_CONFIG.SOLANA_RPC_ENDPOINT, 'confirmed');
+};
+
+// Program ID for the Wybe Token Program
+const PROGRAM_ID = new PublicKey(ENV_CONFIG.PROGRAM_ID);
+
+// Treasury wallet for platform fees
+const TREASURY_WALLET = new PublicKey(ENV_CONFIG.TREASURY_WALLET);
 
 // Deploy a new token using Anchor program
 export async function deployToken(tokenData: {
@@ -19,36 +27,57 @@ export async function deployToken(tokenData: {
   telegram?: string;
 }) {
   try {
-    // Log deployment start
     console.log('Starting token deployment:', tokenData);
     
-    // For development environment, we'll just use mock implementation
-    // In production, this would call the actual Anchor program
-    const result = await anchorDeployToken(tokenData);
-    
-    if (!result.success) {
-      throw new Error(result.error || 'Unknown error during token deployment');
+    // Client side validation
+    if (!tokenData.name || !tokenData.symbol || !tokenData.creatorWallet) {
+      throw new Error('Missing required token data');
     }
+    
+    // Create connection to Solana
+    const connection = getConnection();
+    
+    // Convert string wallet address to PublicKey
+    const creatorPubkey = new PublicKey(tokenData.creatorWallet);
+    
+    // Generate a new keypair for the token
+    const tokenKeypair = Keypair.generate();
+    
+    console.log('Creating token with address:', tokenKeypair.publicKey.toString());
+    
+    // In production, we would use the Anchor client to call the initialize instruction
+    // For now, we'll save the token data to MongoDB and return the token address
+    const tokenAddress = tokenKeypair.publicKey.toString();
     
     // Save token to MongoDB
     await mongoDbService.createToken({
       symbol: tokenData.symbol,
       name: tokenData.name,
-      address: result.tokenAddress,
+      address: tokenAddress,
       ownerWallet: tokenData.creatorWallet,
       launchStatus: 'live',
       // Set some initial market data
       marketCap: 10000, // Initial mock market cap
       volume24h: 500, // Initial mock volume
-      launchDate: new Date(),
+      launchDate: new Date()
     });
     
     toast.success(`Token ${tokenData.name} deployed successfully!`);
-    return result;
+    
+    return {
+      success: true,
+      tokenAddress,
+      error: null
+    };
   } catch (error) {
     console.error('Token deployment error:', error);
     toast.error(`Failed to deploy token: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    throw error;
+    
+    return {
+      success: false,
+      tokenAddress: null,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
   }
 }
 
@@ -60,23 +89,41 @@ export async function buyTokens(config: {
   slippage?: number;
 }) {
   try {
-    // Log buy start
     console.log('Starting token purchase:', config);
     
-    // For development environment, we'll just use mock implementation
-    // In production, this would call the actual Anchor program
-    const result = await anchorBuyTokens(config);
+    // Get connection and token information
+    const connection = getConnection();
+    const tokenPubkey = new PublicKey(config.tokenAddress);
+    const buyerPubkey = new PublicKey(config.walletAddress);
     
-    if (!result.success) {
-      throw new Error(result.error || 'Unknown error during token purchase');
+    // Get token from MongoDB to verify it exists
+    const token = await mongoDbService.getTokenByAddress(config.tokenAddress);
+    if (!token) {
+      throw new Error('Token not found');
     }
     
+    // In production, we would use the Anchor client to call the buy_tokens instruction
+    // For now, we'll simulate a successful transaction and return transaction details
+    
+    // Simulate transaction hash
+    const txHash = 'simulated_tx_' + Math.random().toString(36).substring(2, 15);
+    
     toast.success(`Successfully purchased ${config.amount} tokens`);
-    return result;
+    
+    return {
+      success: true,
+      error: null,
+      transaction: txHash
+    };
   } catch (error) {
     console.error('Token purchase error:', error);
     toast.error(`Failed to buy tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    throw error;
+    
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      transaction: null
+    };
   }
 }
 
@@ -88,46 +135,91 @@ export async function sellTokens(config: {
   slippage?: number;
 }) {
   try {
-    // Log sell start
     console.log('Starting token sale:', config);
     
-    // For development environment, we'll just use mock implementation
-    // In production, this would call the actual Anchor program
-    const result = await anchorSellTokens(config);
+    // Get connection and token information
+    const connection = getConnection();
+    const tokenPubkey = new PublicKey(config.tokenAddress);
+    const sellerPubkey = new PublicKey(config.walletAddress);
     
-    if (!result.success) {
-      throw new Error(result.error || 'Unknown error during token sale');
+    // Get token from MongoDB to verify it exists
+    const token = await mongoDbService.getTokenByAddress(config.tokenAddress);
+    if (!token) {
+      throw new Error('Token not found');
     }
     
+    // In production, we would use the Anchor client to call the sell_tokens instruction
+    // For now, we'll simulate a successful transaction and return transaction details
+    
+    // Simulate transaction hash
+    const txHash = 'simulated_tx_' + Math.random().toString(36).substring(2, 15);
+    
     toast.success(`Successfully sold ${config.amount} tokens`);
-    return result;
+    
+    return {
+      success: true,
+      error: null,
+      transaction: txHash
+    };
   } catch (error) {
     console.error('Token sale error:', error);
     toast.error(`Failed to sell tokens: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    throw error;
+    
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      transaction: null
+    };
   }
 }
 
-// Claim creator rewards for a token
+// Claim creator rewards
 export async function claimCreatorRewards(tokenAddress: string, creatorWallet: string) {
   try {
-    // Log claim start
     console.log('Starting reward claim:', { tokenAddress, creatorWallet });
     
-    // For development environment, we'll just use mock implementation
-    // In production, this would call the actual Anchor program
-    const result = await anchorClaimRewards(tokenAddress, creatorWallet);
+    // Get connection and token information
+    const connection = getConnection();
+    const tokenPubkey = new PublicKey(tokenAddress);
+    const creatorPubkey = new PublicKey(creatorWallet);
     
-    if (!result.success) {
-      throw new Error(result.error || 'Unknown error during reward claim');
+    // Get token from MongoDB to verify it exists and is owned by creator
+    const token = await mongoDbService.getTokenByAddress(tokenAddress);
+    if (!token) {
+      throw new Error('Token not found');
     }
     
-    toast.success(`Successfully claimed creator rewards: ${result.rewardsAmount?.toFixed(4)} SOL`);
-    return result;
+    if (token.ownerWallet !== creatorWallet) {
+      throw new Error('Only the token creator can claim rewards');
+    }
+    
+    // In production, we would use the Anchor client to call the claim_creator_rewards instruction
+    // For now, we'll simulate a successful transaction and return transaction details
+    
+    // Simulate transaction hash
+    const txHash = 'simulated_tx_' + Math.random().toString(36).substring(2, 15);
+    
+    // Simulate rewards amount
+    const rewardsAmount = Math.random() * 0.5; // Between 0 and 0.5 SOL
+    
+    toast.success(`Successfully claimed ${rewardsAmount.toFixed(4)} SOL in creator rewards`);
+    
+    return {
+      success: true,
+      error: null,
+      transaction: txHash,
+      rewardsAmount
+    };
   } catch (error) {
     console.error('Reward claim error:', error);
     toast.error(`Failed to claim rewards: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    throw error;
+    
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      transaction: null,
+      rewardsAmount: 0
+    };
   }
 }
 
@@ -135,9 +227,7 @@ export async function claimCreatorRewards(tokenAddress: string, creatorWallet: s
 export async function isWalletApprovedForTokenCreation(walletAddress: string): Promise<boolean> {
   try {
     // In a real app, this would check against an approved list in MongoDB
-    const admins = await mongoDbService.getAdminByUsername('admin'); // Temporary - would check wallet specifically
-    
-    // For demo purposes, allow any wallet to create tokens
+    // For now, we'll allow any wallet to create tokens
     return true;
   } catch (error) {
     console.error('Approval check error:', error);

@@ -20,15 +20,10 @@ const AdminLoginForm = () => {
     setIsLoading(true);
 
     try {
-      // In a real implementation, this would check against MongoDB
-      // For now, we'll use the dummy implementation that will later connect to MongoDB
-      // Note: In production, use proper authentication with hashed passwords
-      const adminUser = await mongoDbService.getAdminByUsername(username);
+      // Use the real MongoDB service to validate credentials
+      const adminUser = await mongoDbService.validateAdminCredentials(username, password);
       
-      // This is just for demo - in real app we would verify password hash
-      const isValidPassword = (username === 'admin' && password === 'password');
-      
-      if (adminUser && isValidPassword) {
+      if (adminUser) {
         console.log("Credentials valid, setting session data");
         
         // Create session data with permissions
@@ -112,25 +107,35 @@ const AdminLoginForm = () => {
               )}
             </button>
           </div>
-          <div className="text-right text-sm">
-            <AdminPasswordReset />
-          </div>
         </div>
         
-        <Button
-          type="submit"
-          className="w-full bg-orange-500 hover:bg-orange-600"
+        <Button 
+          type="submit" 
+          className="w-full bg-wybe-primary hover:bg-wybe-primary/90"
           disabled={isLoading}
         >
-          {isLoading ? 'Logging in...' : 'Login'}
+          {isLoading ? (
+            <>
+              <span className="mr-2">Logging in</span>
+              <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
+            </>
+          ) : "Login"}
         </Button>
-        
-        <p className="text-sm text-center text-gray-400 mt-4">
-          Demo credentials: <br />
-          Username: <span className="text-white font-mono">admin</span> <br />
-          Password: <span className="text-white font-mono">password</span>
-        </p>
       </form>
+      
+      {/* Password reset option */}
+      <div className="mt-4 text-center">
+        <button
+          type="button"
+          className="text-wybe-secondary hover:underline text-sm"
+          onClick={() => {
+            // For now, just show a toast message
+            toast.info("Please contact the system administrator to reset your password.");
+          }}
+        >
+          Forgot password?
+        </button>
+      </div>
     </div>
   );
 };
