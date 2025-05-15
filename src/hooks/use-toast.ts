@@ -1,6 +1,7 @@
-
+// Import from sonner for toast functionality
 import { toast as sonnerToast } from "sonner";
 
+// Types for the toast
 type ToastProps = {
   title?: string;
   description?: string;
@@ -8,65 +9,76 @@ type ToastProps = {
   type?: "default" | "success" | "error" | "warning" | "info";
 };
 
-export const useToast = () => {
-  const toast = (props: ToastProps) => {
-    const { title, description, action, ...rest } = props;
-    return sonnerToast(title || "", { description, action, ...rest });
-  };
+type ToastActionType = {
+  altText?: string;
+  onClick: () => void;
+  children: React.ReactNode;
+};
 
-  toast.success = (title: string, options?: any) => 
-    sonnerToast.success(`✅ ${title}`, { 
-      className: "rounded-xl border border-green-500/20 shadow-curved",
-      ...options 
-    });
-  
-  toast.error = (title: string, options?: any) => 
-    sonnerToast.error(`❌ ${title}`, { 
-      className: "rounded-xl border border-red-500/20 shadow-curved",
-      ...options 
-    });
-  
-  toast.info = (title: string, options?: any) => 
-    sonnerToast.info(`ℹ️ ${title}`, { 
-      className: "rounded-xl border border-blue-500/20 shadow-curved",
-      ...options 
-    });
-  
-  toast.warning = (title: string, options?: any) => 
-    sonnerToast.warning(`⚠️ ${title}`, { 
-      className: "rounded-xl border border-yellow-500/20 shadow-curved",
-      ...options 
-    });
+// Toast interface for the hook
+export interface ToastOptions extends ToastProps {
+  id?: number | string;
+}
+
+// Main toast hook
+export const useToast = () => {
+  // Keep track of toasts
+  const toasts: ToastOptions[] = [];
 
   return {
-    toast,
-    toasts: [] as any[],
-    dismiss: sonnerToast.dismiss,
-    update: () => {},
+    toasts,
+    toast: (props: ToastOptions) => {
+      sonnerToast(props.title || "", {
+        description: props.description,
+        action: props.action,
+      });
+      return { id: Date.now().toString() };
+    },
+    dismiss: (toastId?: string) => {
+      if (toastId) {
+        sonnerToast.dismiss(toastId);
+      } else {
+        sonnerToast.dismiss();
+      }
+    }
   };
 };
 
-// Export toast methods as named exports - NOT as default export
+// Named exports for toast convenience functions
 export const toast = {
   success: (title: string, options?: any) => 
     sonnerToast.success(`✅ ${title}`, { 
-      className: "rounded-xl border border-green-500/20 shadow-curved",
+      duration: 3000,
+      position: "top-center",
       ...options 
     }),
+
   error: (title: string, options?: any) => 
     sonnerToast.error(`❌ ${title}`, { 
-      className: "rounded-xl border border-red-500/20 shadow-curved",
+      duration: 4000,
+      position: "top-center",
       ...options 
     }),
+
   info: (title: string, options?: any) => 
-    sonnerToast.info(`ℹ️ ${title}`, { 
-      className: "rounded-xl border border-blue-500/20 shadow-curved",
+    sonnerToast(`ℹ️ ${title}`, { 
+      duration: 3000,
+      position: "top-center",
       ...options 
     }),
+
   warning: (title: string, options?: any) => 
     sonnerToast.warning(`⚠️ ${title}`, { 
-      className: "rounded-xl border border-yellow-500/20 shadow-curved",
+      duration: 4000,
+      position: "top-center",
       ...options 
     }),
-  dismiss: sonnerToast.dismiss,
+
+  // Generic method for custom toasts
+  custom: (props: ToastProps) => {
+    return sonnerToast(props.title || "", {
+      description: props.description,
+      action: props.action,
+    });
+  }
 };

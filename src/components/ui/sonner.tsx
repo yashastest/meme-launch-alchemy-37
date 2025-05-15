@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "sonner"
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "dark" } = useTheme()
 
   return (
     <Sonner
@@ -21,7 +21,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton:
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
-        duration: 3000, // Shorter duration for all toasts by default
+        duration: 3000,
       }}
       {...props}
     />

@@ -13,9 +13,15 @@ const AspectRatio = React.forwardRef<
     curvedSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full";
   }
 >(({ className, curved = false, curvedSize = "lg", ...props }, ref) => {
-  const curvedClasses = curved ? 
-    `overflow-hidden rounded-${curvedSize}` : 
-    "";
+  const curvedClasses = curved 
+    ? `overflow-hidden ${curvedSize === "sm" ? "rounded-sm" :
+                       curvedSize === "md" ? "rounded-md" :
+                       curvedSize === "lg" ? "rounded-lg" :
+                       curvedSize === "xl" ? "rounded-xl" :
+                       curvedSize === "2xl" ? "rounded-2xl" :
+                       curvedSize === "3xl" ? "rounded-3xl" :
+                       curvedSize === "full" ? "rounded-full" : "rounded-lg"}` 
+    : "";
     
   return (
     <AspectRatioPrimitive.Root

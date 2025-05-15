@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 interface ShimmerProps extends React.HTMLAttributes<HTMLDivElement> {
   width?: string | number;
   height?: string | number;
-  rounded?: string;
+  rounded?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full"; // Use specific types
   className?: string;
   gradient?: "orange" | "blue" | "green" | "purple" | "gray";
 }
