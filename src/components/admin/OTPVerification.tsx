@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 // Corrected component without TypeScript errors
@@ -41,7 +40,7 @@ const OTPVerification = ({
     setIsResendDisabled(true);
     setResendTimer(60);
     // Placeholder for resend OTP API call
-    toast.success("OTP resent successfully");
+    console.log("OTP resent successfully");
   };
 
   // Function to handle OTP verification
@@ -54,16 +53,16 @@ const OTPVerification = ({
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (otp === "123456") {
-        toast.success("OTP verified successfully");
+        console.log("OTP verified successfully");
         onVerify(true); // Notify parent component that verification is successful
       } else {
         setError("Invalid OTP. Please try again.");
-        toast.error("Invalid OTP. Please try again.");
+        console.error("Invalid OTP. Please try again.");
         onVerify(false); // Notify parent component that verification failed
       }
     } catch (e) {
       setError("An error occurred. Please try again.");
-      toast.error("An error occurred. Please try again.");
+      console.error("An error occurred. Please try again.");
       onVerify(false); // Notify parent component that verification failed
     } finally {
       setIsLoading(false);

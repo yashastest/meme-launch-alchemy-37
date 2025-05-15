@@ -2,7 +2,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { useAdmin } from '@/hooks/useAdmin';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AdminSidebar from '@/components/admin/AdminSidebar';
@@ -105,6 +104,6 @@ const Admin = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Admin;
