@@ -1,7 +1,33 @@
 
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import { Program, AnchorProvider, BN } from '@coral-xyz/anchor';
-import { IDL } from '../target/types/wybe_token_program';
+
+// Define IDL manually since we can't import from target yet
+// This would be auto-generated after running 'anchor build'
+const IDL: any = {
+  version: "0.1.0",
+  name: "wybe_token_program",
+  instructions: [
+    {
+      name: "initialize",
+      accounts: [
+        { name: "tokenData", isMut: true, isSigner: true },
+        { name: "mint", isMut: false, isSigner: false },
+        { name: "creator", isMut: true, isSigner: true },
+        { name: "creatorFeeAccount", isMut: false, isSigner: false },
+        { name: "platformFeeAccount", isMut: false, isSigner: false },
+        { name: "systemProgram", isMut: false, isSigner: false }
+      ],
+      args: [
+        { name: "name", type: "string" },
+        { name: "symbol", type: "string" },
+        { name: "decimals", type: "u8" },
+        { name: "totalSupply", type: "u64" }
+      ]
+    }
+    // Note: Other instructions would be added here in a complete IDL
+  ]
+};
 
 // Token deployment configuration
 interface TokenDeploymentConfig {
