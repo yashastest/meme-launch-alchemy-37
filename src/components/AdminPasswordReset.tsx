@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { toast } from "sonner";
+import { toast } from '@/hooks/use-toast'; // Update the import
 import { 
   Dialog,
   DialogContent,

@@ -25,5 +25,5 @@ const wybeToast = {
     }),
 };
 
-// Named export only, no default exports or re-exports
+// Export the wybeToast as a named export (not as default)
 export { wybeToast };
