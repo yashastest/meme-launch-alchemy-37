@@ -24,12 +24,18 @@ interface Window {
   };
 }
 
-// Make Process interface optional to avoid strict compatibility checks
+// Make the Process interface more flexible to avoid compatibility issues
 declare global {
+  // No need to extend a strict Process interface
   interface Process {
     env: Record<string, string>;
     [key: string]: any;
   }
+  
+  var process: {
+    env: Record<string, string> | {};
+    [key: string]: any;
+  };
 }
 
 export {};

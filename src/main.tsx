@@ -11,10 +11,18 @@ window.global = window;
 
 // Create a simple process object for browser environment
 if (typeof window !== 'undefined') {
-  window.process = {
+  window.process = window.process || {
     env: {},
-    // Add minimal required properties without type assertions
-    nextTick: (fn: () => void) => setTimeout(fn, 0)
+    // Add more fields to satisfy the Process interface
+    argv: [],
+    stdout: null,
+    stderr: null,
+    stdin: null,
+    version: '',
+    versions: {},
+    platform: '',
+    nextTick: (fn: () => void) => setTimeout(fn, 0),
+    cwd: () => '/'
   };
 }
 
