@@ -46,5 +46,5 @@ export const useToast = () => {
   };
 };
 
-// Clean named export for direct toast usage
-export const toast = sonnerToast;
+// We'll use a named export for direct toast usage
+export { sonnerToast as toast };

@@ -25,5 +25,5 @@ const wybeToast = {
     }),
 };
 
-// Clean named exports
-export { wybeToast as toast };
+// Named export only, no default exports or re-exports
+export { wybeToast };
