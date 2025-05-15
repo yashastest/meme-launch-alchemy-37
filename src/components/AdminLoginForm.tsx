@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast"; // Import directly from our hooks
+import { toast } from "@/hooks/use-toast"; 
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import AdminPasswordReset from "./AdminPasswordReset";
 import mongoDbService from '@/services/mongoDbService';

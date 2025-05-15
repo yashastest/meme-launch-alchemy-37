@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Index from './pages/Index';
 import Admin from './pages/Admin';
@@ -21,23 +21,21 @@ function App() {
   return (
     <SolanaWalletProvider>
       <WalletProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/admin/*" element={<Admin />} />
-            <Route path="/launch" element={<Launch />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/discover" element={<Discover />} />
-            <Route path="/trade" element={<Trade />} />
-            <Route path="/token/:tokenId" element={<TokenDashboard />} />
-            <Route path="/security-report" element={<SecurityReport />} />
-            <Route path="/deployment-guide" element={<MasterDeploymentGuide />} />
-            <Route path="/404" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/404" replace />} />
-          </Routes>
-          <Toaster />
-        </BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin/*" element={<Admin />} />
+          <Route path="/launch" element={<Launch />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/trade" element={<Trade />} />
+          <Route path="/token/:tokenId" element={<TokenDashboard />} />
+          <Route path="/security-report" element={<SecurityReport />} />
+          <Route path="/deployment-guide" element={<MasterDeploymentGuide />} />
+          <Route path="/404" element={<NotFound />} />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Routes>
+        <Toaster />
       </WalletProvider>
     </SolanaWalletProvider>
   );
