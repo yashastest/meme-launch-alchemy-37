@@ -21,7 +21,7 @@ interface Window {
   };
 }
 
-// Simplify the Process type to avoid compatibility issues
+// Remove all Process interface definitions
 declare global {
   var process: any; // Use 'any' type to avoid strict type checking
 }

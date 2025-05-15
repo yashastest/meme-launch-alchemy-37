@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -10,7 +11,8 @@ window.global = window;
 
 // Create a simple process object for browser environment
 if (typeof window !== 'undefined') {
-  window.process = window.process || {
+  // Cast to any to bypass type checking completely
+  window.process = {
     env: {},
     argv: [],
     stdout: null,
@@ -21,7 +23,7 @@ if (typeof window !== 'undefined') {
     platform: '',
     nextTick: (fn: () => void) => setTimeout(fn, 0),
     cwd: () => '/'
-  };
+  } as any;
 }
 
 window.Buffer = window.Buffer || { isBuffer: () => false };
