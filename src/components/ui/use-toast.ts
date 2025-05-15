@@ -3,19 +3,39 @@
 // All imports that might use this will be handled with fallbacks
 
 const noopFn = () => {};
-const createToastFn = () => ({ id: "1", dismiss: noopFn, update: noopFn });
 
-export const toast = {
-  // Basic toast function
-  ...((options?: any) => createToastFn()),
-  // Common toast variants
-  success: (options?: any) => createToastFn(),
-  error: (options?: any) => createToastFn(),
-  info: (options?: any) => createToastFn(),
-  warning: (options?: any) => createToastFn(),
-  dismiss: noopFn,
-  update: () => createToastFn(),
-};
+// Create a function that returns an object with the expected shape
+const createToast = (options?: any) => ({
+  id: "1", 
+  dismiss: noopFn, 
+  update: noopFn,
+  // Add these properties to fix TypeScript errors
+  success: noopFn,
+  error: noopFn,
+  warning: noopFn,
+  info: noopFn
+});
+
+// Create the toast object with all required methods
+export const toast = Object.assign(
+  // Base toast function
+  (options?: any) => createToast(options),
+  {
+    // Common toast variants
+    success: (options?: any) => createToast(options),
+    error: (options?: any) => createToast(options),
+    info: (options?: any) => createToast(options),
+    warning: (options?: any) => createToast(options),
+    // Additional methods
+    dismiss: noopFn,
+    update: (id: string, options?: any) => createToast(options),
+    // Add these properties to the object itself
+    success: noopFn,
+    error: noopFn,
+    warning: noopFn,
+    info: noopFn
+  }
+);
 
 export const useToast = () => {
   return {
