@@ -13,7 +13,7 @@ export type ToastProps = {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionType;
+  action?: React.ReactNode; // Changed from ToastActionType to ReactNode
   type?: "default" | "success" | "warning" | "destructive" | "error" | "info";
   duration?: number;
 };

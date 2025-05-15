@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -67,9 +66,7 @@ export const useAdmin = () => {
     setIsAuthenticated(false);
     setAuthCheckCompleted(true);
     navigate('/admin-login', { replace: true });
-    toast.success("Logged out successfully", {
-      duration: 3000,
-    });
+    toast.success("Logged out successfully");
   };
 
   const hasPermission = (requiredPermission: string): boolean => {
