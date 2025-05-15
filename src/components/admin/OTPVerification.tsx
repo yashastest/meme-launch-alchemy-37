@@ -79,21 +79,18 @@ const OTPVerification = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <InputOTPGroup>
-          {/* Fix: Create InputOTPSlot components instead of using length prop */}
-          <InputOTP
-            maxLength={6}
-            value={otp}
-            onChange={(value) => setOtp(value)}
-            render={({ slots }) => (
-              <>
-                {slots.map((slot, index) => (
-                  <InputOTPSlot key={index} {...slot} index={index} />
-                ))}
-              </>
-            )}
-          />
-        </InputOTPGroup>
+        <InputOTP
+          maxLength={6}
+          value={otp}
+          onChange={setOtp}
+          render={({ slots }) => (
+            <InputOTPGroup>
+              {slots.map((slot, index) => (
+                <InputOTPSlot key={index} {...slot} />
+              ))}
+            </InputOTPGroup>
+          )}
+        />
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </CardContent>
       <CardFooter className="flex flex-col space-y-2">
