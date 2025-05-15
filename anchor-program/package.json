@@ -1,22 +1,29 @@
 
 {
-  "name": "wybe-anchor-program",
+  "name": "wybe_token_program",
   "version": "0.1.0",
-  "description": "Wybe Finance Anchor Program",
+  "description": "Wybe Token Program using Anchor framework",
   "main": "index.js",
   "scripts": {
     "build": "anchor build",
     "deploy": "anchor deploy",
     "test": "anchor test",
-    "lint": "eslint .",
-    "clean": "rm -rf target"
+    "deploy-token": "node scripts/deploy_token.js"
   },
+  "keywords": [
+    "solana",
+    "anchor",
+    "blockchain",
+    "token"
+  ],
   "dependencies": {
-    "@project-serum/anchor": "^0.26.0",
-    "@solana/web3.js": "^1.77.0",
-    "fs": "0.0.1-security"
+    "@coral-xyz/anchor": "^0.29.0",
+    "@solana/spl-token": "^0.3.8",
+    "@solana/web3.js": "^1.78.4",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
+    "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
