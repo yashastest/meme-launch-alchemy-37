@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, AlertTriangle, Shield, Rocket } from "lucide-react";
@@ -147,7 +148,7 @@ const TokenCreationForm: React.FC<TokenCreationFormProps> = ({ activeTab, setAct
     setIsCreating(true);
     
     try {
-      toast.success("Creating your token...", { duration: 5000 });
+      toast.success("Creating your token...");
       
       // Prepare token deployment config
       const tokenConfig: TokenDeploymentConfig = {

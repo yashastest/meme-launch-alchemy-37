@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +41,6 @@ const OTPVerification = ({
     setIsResendDisabled(true);
     setResendTimer(60);
     // Placeholder for resend OTP API call
-    // Example: api.resendOTP(phoneNumber).then(() => toast.success("OTP resent successfully"));
     toast.success("OTP resent successfully");
   };
 
@@ -80,13 +80,18 @@ const OTPVerification = ({
       </CardHeader>
       <CardContent>
         <InputOTPGroup>
+          {/* Fix: Create InputOTPSlot components instead of using length prop */}
           <InputOTP
-            length={6}
+            maxLength={6}
+            value={otp}
             onChange={(value) => setOtp(value)}
-            onComplete={(value) => {
-              console.log("OTP completed:", value);
-              setOtp(value);
-            }}
+            render={({ slots }) => (
+              <>
+                {slots.map((slot, index) => (
+                  <InputOTPSlot key={index} {...slot} index={index} />
+                ))}
+              </>
+            )}
           />
         </InputOTPGroup>
         {error && <p className="text-red-500 mt-2">{error}</p>}
