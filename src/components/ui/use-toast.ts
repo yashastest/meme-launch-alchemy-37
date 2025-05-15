@@ -26,5 +26,5 @@ export const configuredToast = {
     }),
 };
 
-// Export as named export
-export const toast = configuredToast;
+// Export as named export only (no default)
+export { configuredToast as toast };

@@ -42,10 +42,9 @@ export const useToast = () => {
     toast,
     toasts: [] as any[],
     dismiss: sonnerToast.dismiss,
-    // For compatibility with radix toast
     update: () => {},
   };
 };
 
-// Direct named export for convenience (no default export)
+// Export the original sonner toast for direct usage
 export { sonnerToast as toast };
