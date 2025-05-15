@@ -1,7 +1,7 @@
 
-import { toast as sonnerToast, type Toast } from "sonner";
+import { toast as sonnerToast } from "sonner";
 
-type ToastProps = Toast & {
+type ToastProps = {
   title?: string;
   description?: string;
   action?: React.ReactNode;
