@@ -1,7 +1,15 @@
 
 import * as React from "react";
+import { Toaster as SonnerToaster } from "sonner";
 
 export function Toaster() {
-  // Return null to render nothing, preventing any potential rendering errors
-  return null;
+  return (
+    <SonnerToaster 
+      position="bottom-right"
+      toastOptions={{
+        duration: 3000,
+        className: "toast-style",
+      }}
+    />
+  );
 }

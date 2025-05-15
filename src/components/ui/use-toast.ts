@@ -1,6 +1,8 @@
 
-// This file is kept for compatibility but will contain no actual functionality
-// All imports that might use this will be handled with fallbacks
+// This file is kept for compatibility with components expecting shadcn/ui toast functionality
+// It delegates to the sonner toast
+
+import { toast as sonnerToast } from "sonner";
 
 const noopFn = () => {};
 
@@ -12,20 +14,37 @@ const createToast = (options?: any) => ({
 });
 
 // Create the toast object with all required methods
-export const toast = Object.assign(
+export const toast = {
   // Base toast function
-  (options?: any) => createToast(options),
-  {
-    // Common toast variants as methods
-    success: (options?: any) => createToast(options),
-    error: (options?: any) => createToast(options),
-    info: (options?: any) => createToast(options),
-    warning: (options?: any) => createToast(options),
-    // Additional methods
-    dismiss: noopFn,
-    update: (id: string, options?: any) => createToast(options)
+  (options?: any) {
+    sonnerToast(options?.title || options || "", options?.description || "");
+    return createToast(options);
+  },
+  
+  // Common toast variants as methods
+  success(options?: any) {
+    sonnerToast.success(options?.title || options || "", options?.description || "");
+    return createToast(options);
+  },
+  error(options?: any) {
+    sonnerToast.error(options?.title || options || "", options?.description || "");
+    return createToast(options);
+  },
+  info(options?: any) {
+    sonnerToast.info(options?.title || options || "", options?.description || "");
+    return createToast(options);
+  },
+  warning(options?: any) {
+    sonnerToast.warning(options?.title || options || "", options?.description || "");
+    return createToast(options);
+  },
+  
+  // Additional methods
+  dismiss: noopFn,
+  update(id: string, options?: any) {
+    return createToast(options);
   }
-);
+};
 
 export const useToast = () => {
   return {

@@ -15,6 +15,7 @@ import SecurityReport from './pages/SecurityReport';
 import { SolanaWalletProvider } from './hooks/useSolanaWallet';
 import { WalletProvider } from './hooks/useWallet';
 import TokenDashboard from '@/components/TokenDashboard';
+import { Toaster } from '@/components/ui/toaster';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/404" element={<NotFound />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
+        <Toaster />
       </WalletProvider>
     </SolanaWalletProvider>
   );
