@@ -1,4 +1,3 @@
-
 import { connectMongo } from '@/lib/mongodb';
 import AdminUserModel, { AdminUser } from '@/models/AdminUser';
 import TokenModel, { TokenDocument } from '@/models/Token';
