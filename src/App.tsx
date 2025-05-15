@@ -10,7 +10,7 @@ import LaunchPackage from './pages/LaunchPackage';
 import Discover from './pages/Discover';
 import Trade from './pages/Trade';
 import NotFound from './pages/NotFound';
-import { Toaster } from "@/components/ui/sonner"; // Using the Toaster from sonner.tsx
+import { Toaster } from "@/components/ui/sonner"; 
 import SecurityReport from './pages/SecurityReport';
 import { SolanaWalletProvider } from './hooks/useSolanaWallet';
 import { WalletProvider } from './hooks/useWallet';

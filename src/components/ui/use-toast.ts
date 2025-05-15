@@ -3,4 +3,4 @@
 import { toast } from "@/hooks/use-toast";
 
 // Re-export the toast from hooks for backward compatibility
-export const wybeToast = toast;
+export { toast };

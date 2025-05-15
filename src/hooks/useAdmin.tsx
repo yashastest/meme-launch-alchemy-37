@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 export const useAdmin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,26 +27,20 @@ export const useAdmin = () => {
       console.log("Auth check:", { isLoggedIn, sessionExists, path: location.pathname });
       
       if (isLoggedIn && sessionExists) {
-        try {
-          // Load permissions from session
-          const parsedSession = JSON.parse(sessionData || '{}');
-          const permissions = parsedSession.permissions || ['default'];
-          setAdminPermissions(permissions);
-          
-          // Check if session has expired
-          const expiryTime = parsedSession.expiryTime;
-          if (expiryTime && new Date().getTime() > expiryTime) {
-            console.log("Session expired, logging out");
-            await logout();
-            return;
-          }
-          
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error("Error parsing session data:", error);
-          setAdminPermissions(['default']);
-          setIsAuthenticated(false);
+        // Load permissions from session
+        const parsedSession = JSON.parse(sessionData || '{}');
+        const permissions = parsedSession.permissions || ['default'];
+        setAdminPermissions(permissions);
+        
+        // Check if session has expired
+        const expiryTime = parsedSession.expiryTime;
+        if (expiryTime && new Date().getTime() > expiryTime) {
+          console.log("Session expired, logging out");
+          await logout();
+          return;
         }
+        
+        setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
         
