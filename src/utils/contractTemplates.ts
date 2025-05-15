@@ -249,7 +249,7 @@ pub enum TreasuryError {
 /**
  * Get contract template with program ID inserted
  */
-export const getContractTemplate = (type: 'token' | 'treasury', programId: string): string => {
+export const getContractTemplate = (type: 'token' | 'treasury' | 'other', programId: string): string => {
   let template = '';
   
   switch(type) {
@@ -258,6 +258,9 @@ export const getContractTemplate = (type: 'token' | 'treasury', programId: strin
       break;
     case 'treasury':
       template = contractTemplates.treasuryProgram;
+      break;
+    case 'other':
+      template = '// Custom contract template\n// Program ID: ' + programId;
       break;
     default:
       template = '// No template available for this contract type';
