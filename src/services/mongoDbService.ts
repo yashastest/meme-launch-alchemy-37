@@ -5,12 +5,10 @@ import TokenModel, { TokenDocument } from '@/models/Token';
 import SubmissionModel, { SubmissionDocument } from '@/models/CreatorSubmission';
 import bcrypt from 'bcryptjs';
 
-// MongoDB schema examples
-export {
-  AdminUser,
-  TokenDocument as TokenData,
-  SubmissionDocument as CreatorSubmission
-};
+// MongoDB schema examples - using export type for type re-exports
+export { AdminUser };
+export type { TokenDocument as TokenData };
+export type { SubmissionDocument as CreatorSubmission };
 
 // Real MongoDB service implementation
 class MongoDbService {
@@ -119,7 +117,7 @@ class MongoDbService {
   }
   
   // Token management
-  async getTokens(filters?: Partial<TokenDocument>): Promise<TokenDocument[]> {
+  async getTokens(filters?: Record<string, any>): Promise<TokenDocument[]> {
     try {
       await connectMongo();
       

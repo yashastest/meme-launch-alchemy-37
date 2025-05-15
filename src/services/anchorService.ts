@@ -1,4 +1,3 @@
-
 import { toast } from '@/hooks/use-toast';
 import mongoDbService from '@/services/mongoDbService';
 import { ENV_CONFIG } from '@/config/env.config';
@@ -49,17 +48,13 @@ export async function deployToken(tokenData: {
     // For now, we'll save the token data to MongoDB and return the token address
     const tokenAddress = tokenKeypair.publicKey.toString();
     
-    // Save token to MongoDB
+    // Save token to MongoDB - explicitly construct the object with only the fields from TokenDocument
     await mongoDbService.createToken({
       symbol: tokenData.symbol,
       name: tokenData.name,
       address: tokenAddress,
       ownerWallet: tokenData.creatorWallet,
-      launchStatus: 'live',
-      // Set some initial market data
-      marketCap: 10000, // Initial mock market cap
-      volume24h: 500, // Initial mock volume
-      launchDate: new Date()
+      launchStatus: 'live'
     });
     
     toast.success(`Token ${tokenData.name} deployed successfully!`);
