@@ -14,28 +14,16 @@ interface Window {
     publicKey?: { toString: () => string };
   };
   global: typeof globalThis;
-  process: {
-    env: Record<string, string> | {};
-    [key: string]: any; // Allow for additional properties without strict typing
-  };
+  process: any; // Change to any to avoid type issues
   Buffer: {
     isBuffer?: (obj: any) => boolean;
     [key: string]: any;
   };
 }
 
-// Make the Process interface more flexible to avoid compatibility issues
+// Simplify the Process type to avoid compatibility issues
 declare global {
-  // No need to extend a strict Process interface
-  interface Process {
-    env: Record<string, string>;
-    [key: string]: any;
-  }
-  
-  var process: {
-    env: Record<string, string> | {};
-    [key: string]: any;
-  };
+  var process: any; // Use 'any' type to avoid strict type checking
 }
 
 export {};

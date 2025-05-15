@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -13,7 +12,6 @@ window.global = window;
 if (typeof window !== 'undefined') {
   window.process = window.process || {
     env: {},
-    // Add more fields to satisfy the Process interface
     argv: [],
     stdout: null,
     stderr: null,
