@@ -1,6 +1,7 @@
 
 // Import from sonner for toast functionality
 import { toast as sonnerToast } from "sonner";
+import * as React from "react";
 
 // Types for the toast
 export interface ToastProps {
