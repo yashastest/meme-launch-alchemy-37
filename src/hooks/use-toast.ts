@@ -46,7 +46,7 @@ export const useToast = () => {
   };
 };
 
-// Export a simple toast function for direct use in components
+// Export toast methods as named exports - NOT as default export
 export const toast = {
   success: (title: string, options?: any) => 
     sonnerToast.success(`✅ ${title}`, { 
