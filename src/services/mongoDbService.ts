@@ -130,7 +130,7 @@ class MongoDbService {
     }
   }
   
-  async createToken(tokenData: Omit<TokenDocument, 'id' | 'createdAt'>): Promise<TokenDocument | null> {
+  async createToken(tokenData: any): Promise<TokenDocument | null> {
     try {
       await connectMongo();
       

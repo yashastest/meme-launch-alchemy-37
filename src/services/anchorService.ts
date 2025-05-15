@@ -1,3 +1,4 @@
+
 import { toast } from '@/hooks/use-toast';
 import mongoDbService from '@/services/mongoDbService';
 import { ENV_CONFIG } from '@/config/env.config';
@@ -48,7 +49,7 @@ export async function deployToken(tokenData: {
     // For now, we'll save the token data to MongoDB and return the token address
     const tokenAddress = tokenKeypair.publicKey.toString();
     
-    // Save token to MongoDB - explicitly construct the object with only the fields from TokenDocument
+    // Save token to MongoDB using a simpler approach with any type to avoid complex mongoose types
     await mongoDbService.createToken({
       symbol: tokenData.symbol,
       name: tokenData.name,
