@@ -1,5 +1,5 @@
 
-import * as React from "react"
+import * as React from "react";
 import {
   Toast,
   ToastClose,
@@ -8,17 +8,17 @@ import {
   ToastTitle,
   ToastViewport,
   type ToastProps as RadixToastProps
-} from "@/components/ui/toast"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToast();
 
   // Map toast types to variants
   const mapToastTypeToVariant = (type?: string): "default" | "destructive" => {
-    if (type === "destructive" || type === "error") return "destructive"
-    return "default"
-  }
+    if (type === "destructive" || type === "error") return "destructive";
+    return "default";
+  };
 
   return (
     <ToastProvider>
@@ -44,9 +44,9 @@ export function Toaster() {
             {action}
             <ToastClose />
           </Toast>
-        )
+        );
       })}
       <ToastViewport />
     </ToastProvider>
-  )
+  );
 }

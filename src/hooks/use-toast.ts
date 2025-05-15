@@ -1,5 +1,4 @@
 
-// Import from sonner for toast functionality
 import { toast as sonnerToast } from "sonner";
 import * as React from "react";
 
@@ -24,25 +23,35 @@ export interface ToastOptions extends ToastProps {
 
 // Main toast hook
 export const useToast = () => {
-  // Keep track of toasts
-  const toasts: ToastOptions[] = [];
+  // Create a state array for toasts
+  const [toasts, setToasts] = React.useState<ToastOptions[]>([]);
+
+  const toast = (props: ToastOptions) => {
+    const id = props.id || Date.now().toString();
+    setToasts((prevToasts) => [...prevToasts, { ...props, id }]);
+    
+    sonnerToast(props.title || "", {
+      description: props.description,
+      action: props.action,
+    });
+    
+    return { id };
+  };
+
+  const dismiss = (toastId?: string) => {
+    if (toastId) {
+      setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== toastId));
+      sonnerToast.dismiss(toastId);
+    } else {
+      setToasts([]);
+      sonnerToast.dismiss();
+    }
+  };
 
   return {
     toasts,
-    toast: (props: ToastOptions) => {
-      sonnerToast(props.title || "", {
-        description: props.description,
-        action: props.action,
-      });
-      return { id: Date.now().toString() };
-    },
-    dismiss: (toastId?: string) => {
-      if (toastId) {
-        sonnerToast.dismiss(toastId);
-      } else {
-        sonnerToast.dismiss();
-      }
-    }
+    toast,
+    dismiss
   };
 };
 
