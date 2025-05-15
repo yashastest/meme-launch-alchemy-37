@@ -2,8 +2,7 @@
 import { toast as sonnerToast } from "sonner";
 
 // Configure the toast with custom properties for curved UI
-const configuredToast = {
-  ...sonnerToast,
+const wybeToast = {
   success: (title: string, options?: any) => 
     sonnerToast.success(`✅ ${title}`, { 
       className: "rounded-xl border border-green-500/20 shadow-curved",
@@ -26,5 +25,5 @@ const configuredToast = {
     }),
 };
 
-// Export as named export
-export { configuredToast as toast };
+// Clean named exports
+export { wybeToast as toast };
