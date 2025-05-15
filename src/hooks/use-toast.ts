@@ -47,5 +47,5 @@ export const useToast = () => {
   };
 };
 
-// Direct export for convenience
+// Direct named export for convenience (no default export)
 export { sonnerToast as toast };

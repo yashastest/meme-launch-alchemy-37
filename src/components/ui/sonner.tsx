@@ -1,6 +1,6 @@
 
 import { useTheme } from "next-themes"
-import { Toaster as Sonner } from "sonner"
+import { Toaster as Sonner, toast as sonnerToast } from "sonner"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
@@ -28,7 +28,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
+// Export individually instead of star export
 export { Toaster }
-
-// Re-export the toast function from sonner for convenience
-export { toast } from 'sonner'
+export { sonnerToast as toast }
