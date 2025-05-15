@@ -1,29 +1,37 @@
 
 /// <reference types="vite/client" />
 
+// Define global window extensions for Solana wallet and process polyfills
 interface Window {
   solana?: {
-    isPhantom?: boolean;
-    connect?: () => Promise<{ publicKey: { toString: () => string } }>;
-    disconnect?: () => Promise<void>;
-    signTransaction?: (transaction: any) => Promise<any>;
-    signAllTransactions?: (transactions: any[]) => Promise<any[]>;
-    request?: (request: { method: string; params?: any }) => Promise<any>;
-    on?: (event: string, listener: (...args: any[]) => void) => void;
-    off?: (event: string, listener: (...args: any[]) => void) => void;
-    publicKey?: { toString: () => string };
+    isPhantom: boolean;
+    connect: () => Promise<{ publicKey: { toString: () => string } }>;
+    disconnect: () => Promise<void>;
+    [key: string]: any;
   };
-  global: typeof globalThis;
-  process: any; // Change to any to avoid type issues
-  Buffer: {
-    isBuffer?: (obj: any) => boolean;
+  process?: any;
+  global?: any;
+  Buffer?: {
+    isBuffer: (obj: any) => boolean;
     [key: string]: any;
   };
 }
 
-// Remove all Process interface definitions
-declare global {
-  var process: any; // Use 'any' type to avoid strict type checking
+// Add missing interfaces for API compatibility
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+  readonly VITE_SOLANA_RPC_URL: string;
+  readonly VITE_SOLANA_NETWORK: string;
+  // add more env variables as needed
 }
 
-export {};
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
+// Explicitly declare process as any type to avoid TypeScript errors
+declare global {
+  var process: any;
+  var global: any;
+  var Buffer: any;
+}
