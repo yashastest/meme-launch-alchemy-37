@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { smartContractService } from "@/services/smartContractService";
+import { getContractTemplate } from "@/utils/contractTemplates";
 import {
   FileCode,
   ArrowUpRight,
@@ -13,7 +14,11 @@ import {
   RefreshCcw,
   CheckCircle,
   XCircle,
-  ArrowRight
+  ArrowRight,
+  Download,
+  ExternalLink,
+  Eye,
+  Code
 } from "lucide-react";
 
 import {
@@ -25,23 +30,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from "@/components/ui/dialog";
+
 import { useNavigate } from 'react-router-dom';
 
-interface TestnetContract {
-  name: string;
-  programId: string;
-  deployDate: string;
-  network: string;
-  txHash: string;
-  status: string;
-}
-
 const SmartContractTestnet = () => {
-  const [contracts, setContracts] = useState<TestnetContract[]>([]);
+  const [contracts, setContracts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContract, setSelectedContract] = useState<TestnetContract | null>(null);
+  const [selectedContract, setSelectedContract] = useState<any | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showContractDetails, setShowContractDetails] = useState(false);
+  const [contractCode, setContractCode] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,7 +82,7 @@ const SmartContractTestnet = () => {
     toast.success("Contract list refreshed");
   };
 
-  const handleDeployToMainnet = (contract: TestnetContract) => {
+  const handleDeployToMainnet = (contract: any) => {
     setSelectedContract(contract);
     
     // Redirect to deployment environment page
@@ -90,6 +97,44 @@ const SmartContractTestnet = () => {
 
   const handleNewDeployment = () => {
     navigate('/admin/deployment');
+  };
+
+  const handleViewContractDetails = (contract: any) => {
+    setSelectedContract(contract);
+    // Get the contract code from the contract type
+    if (contract.contractType) {
+      setContractCode(getContractTemplate(contract.contractType, contract.programId));
+    } else {
+      setContractCode(`// No source code available for ${contract.name}`);
+    }
+    setShowContractDetails(true);
+  };
+
+  const handleDownloadContract = (contract: any) => {
+    let code = '';
+    if (contract.contractType) {
+      code = getContractTemplate(contract.contractType, contract.programId);
+    } else {
+      code = `// No source code available for ${contract.name}`;
+    }
+    
+    const fileName = `${contract.name.toLowerCase().replace(/\s+/g, '_')}.rs`;
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    
+    toast.success(`Contract source code downloaded as ${fileName}`);
+  };
+
+  const handleViewTransactionDetails = (txHash: string) => {
+    const explorerUrl = `https://explorer.solana.com/tx/${txHash}?cluster=testnet`;
+    window.open(explorerUrl, '_blank');
   };
 
   const filteredContracts = contracts.filter(contract =>
@@ -210,17 +255,48 @@ const SmartContractTestnet = () => {
                         </div>
                       )}
                     </TableCell>
-                    <TableCell>{contract.deployDate}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span>{contract.deployDate}</span>
+                        <button 
+                          className="text-gray-400 hover:text-blue-400" 
+                          title="View transaction"
+                          onClick={() => handleViewTransactionDetails(contract.txHash)}
+                        >
+                          <ExternalLink size={12} />
+                        </button>
+                      </div>
+                    </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/30"
-                        onClick={() => handleDeployToMainnet(contract)}
-                      >
-                        <ArrowUpRight size={12} className="mr-1" />
-                        Deploy to Mainnet
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border-blue-500/30"
+                          onClick={() => handleViewContractDetails(contract)}
+                        >
+                          <Eye size={12} className="mr-1" />
+                          View Code
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/30"
+                          onClick={() => handleDownloadContract(contract)}
+                        >
+                          <Download size={12} className="mr-1" />
+                          Download
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-400 border-green-500/30"
+                          onClick={() => handleDeployToMainnet(contract)}
+                        >
+                          <ArrowUpRight size={12} className="mr-1" />
+                          To Mainnet
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -243,8 +319,78 @@ const SmartContractTestnet = () => {
         </div>
       )}
       
+      {/* Contract Details Dialog */}
+      <Dialog open={showContractDetails} onOpenChange={setShowContractDetails}>
+        <DialogContent className="max-w-4xl bg-black/90 border border-white/10">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <Code className="text-orange-500" />
+              {selectedContract?.name} Source Code
+            </DialogTitle>
+            <DialogDescription>
+              <div className="flex justify-between items-center">
+                <span className="font-mono text-xs text-gray-400">Program ID: {selectedContract?.programId}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400">Deployed on: {selectedContract?.deployDate}</span>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="bg-black/50 rounded-md p-4 border border-white/10">
+            <div className="flex justify-between items-center mb-2">
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30">
+                Rust
+              </Badge>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs"
+                onClick={() => selectedContract && handleDownloadContract(selectedContract)}
+              >
+                <Download size={12} className="mr-1" />
+                Download Source
+              </Button>
+            </div>
+            <pre className="overflow-x-auto bg-black/30 p-4 rounded-md max-h-[500px] overflow-y-auto">
+              <code className="text-xs font-mono whitespace-pre text-white">
+                {contractCode}
+              </code>
+            </pre>
+          </div>
+          
+          <div className="flex justify-between mt-4">
+            <Button variant="outline" size="sm" asChild>
+              <a 
+                href={`https://explorer.solana.com/address/${selectedContract?.programId}?cluster=testnet`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-1"
+              >
+                <ExternalLink size={12} className="mr-1" />
+                View on Explorer
+              </a>
+            </Button>
+            
+            <div className="flex gap-2">
+              <DialogClose asChild>
+                <Button variant="ghost" size="sm">Close</Button>
+              </DialogClose>
+              <Button 
+                className="bg-orange-500 hover:bg-orange-600" 
+                size="sm"
+                onClick={() => selectedContract && handleDeployToMainnet(selectedContract)}
+              >
+                <ArrowUpRight size={12} className="mr-1" />
+                Deploy to Mainnet
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       <div className="mt-8 text-center text-gray-400 text-sm">
-        <p>Need help with contract deployment? Visit the <a href="#" className="text-orange-400 hover:underline">Master Deployment Guide</a>.</p>
+        <p>Need help with contract deployment? Visit the <a href="/admin/guide" className="text-orange-400 hover:underline">Master Deployment Guide</a>.</p>
       </div>
     </motion.div>
   );

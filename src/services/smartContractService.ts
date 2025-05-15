@@ -1,5 +1,6 @@
 // Smart contract service for admin dashboard
 // This service handles smart contract related operations
+import { getContractTemplate } from "@/utils/contractTemplates";
 
 // Contract Configuration Type
 export interface ContractConfig {
@@ -66,6 +67,7 @@ interface TestnetContract {
   network: string;
   txHash: string;
   status: string;
+  contractType: 'token' | 'treasury' | 'other';
 }
 
 interface TestResults {
@@ -240,7 +242,8 @@ Program ID: ${deployedProgramId}
         network: 'testnet',
         deployDate: '2023-10-15',
         txHash: 'tx_3jP88qZ5M1pXbUfGiA7LmX4VnDS3eAo8x3vZh4RnD5oQy6F711bPw3dH5M9S',
-        status: 'active'
+        status: 'active',
+        contractType: 'token'
       },
       {
         name: 'Creator Fee Treasury',
@@ -248,7 +251,8 @@ Program ID: ${deployedProgramId}
         network: 'testnet',
         deployDate: '2023-10-17',
         txHash: 'tx_5kO93pG7Y2q0dWgTiA8KnZ7RnQS4fL9z5wZd6PqF7nRx4E511cQr5eJ3T2V',
-        status: 'active'
+        status: 'active',
+        contractType: 'treasury'
       }
     ];
     
@@ -256,6 +260,11 @@ Program ID: ${deployedProgramId}
     localStorage.setItem('deployedTestnetContracts', JSON.stringify(defaultContracts));
     
     return defaultContracts;
+  },
+  
+  // Get contract source code
+  getContractSourceCode: (contract: TestnetContract): string => {
+    return getContractTemplate(contract.contractType, contract.programId);
   },
   
   // Run security audit on smart contract
